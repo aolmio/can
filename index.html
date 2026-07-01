@@ -25,44 +25,48 @@
     --surface: #ffffff;
     --text: #000000;
     --text-muted: #8e8e93;
-    --primary: #007aff;
+    --primary: #d4a000;
+    --diamond: #0ea5e9;
     --danger: #ff3b30;
     --border: #c6c6c8;
-    --radius: 12px;
-    --nav-bg: rgba(255, 255, 255, 0.85);
+    --radius: 18px;
+    --nav-bg: rgba(255, 255, 255, 0.75);
   }
   body.ios-dark {
     --bg: #000000;
     --surface: #1c1c1e;
     --text: #ffffff;
     --text-muted: #ebebf5;
-    --primary: #0a84ff;
+    --primary: #f5c518;
+    --diamond: #38bdf8;
     --danger: #ff453a;
     --border: #38383a;
-    --radius: 12px;
-    --nav-bg: rgba(28, 28, 30, 0.85);
+    --radius: 18px;
+    --nav-bg: rgba(28, 28, 30, 0.75);
   }
   body.oneui-light {
     --bg: #f2f2f2;
     --surface: #fafafa;
     --text: #191919;
     --text-muted: #7b7b7b;
-    --primary: #3e91ff;
+    --primary: #d4a000;
+    --diamond: #0ea5e9;
     --danger: #f25555;
     --border: #e0e0e0;
-    --radius: 24px;
-    --nav-bg: rgba(250, 250, 250, 0.95);
+    --radius: 26px;
+    --nav-bg: rgba(250, 250, 250, 0.85);
   }
   body.oneui-dark {
     --bg: #0f0f0f;
     --surface: #181818;
     --text: #f0f0f0;
     --text-muted: #a0a0a0;
-    --primary: #4a9fff;
+    --primary: #f5c518;
+    --diamond: #38bdf8;
     --danger: #ff6b6b;
     --border: #2a2a2a;
-    --radius: 24px;
-    --nav-bg: rgba(24, 24, 24, 0.95);
+    --radius: 26px;
+    --nav-bg: rgba(24, 24, 24, 0.85);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -83,8 +87,8 @@
   .header-bar {
     padding-top: var(--safe-top);
     background: var(--nav-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     z-index: 50;
@@ -104,7 +108,6 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    /* Increased bottom padding to guarantee bottom buttons are never obscured */
     padding: 16px 16px calc(var(--nav-h) + var(--safe-bottom) + 48px) 16px;
   }
 
@@ -114,7 +117,6 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    /* Using min-height instead of fixed height to allow dynamic scrolling without cutting off */
     min-height: 100%; 
   }
 
@@ -186,6 +188,8 @@
   }
   .inp:focus { border-color: var(--primary); }
   .inp-center { text-align: center; }
+  
+  .inp-diamond:focus { border-color: var(--diamond); }
 
   .btn-primary {
     width: 100%;
@@ -194,7 +198,7 @@
     border: none;
     font-weight: 800;
     font-size: 15px;
-    color: #ffffff;
+    color: #000000;
     background: var(--primary);
     cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -202,6 +206,22 @@
     height: 52px;
   }
   .btn-primary:active { transform: scale(0.97); filter: brightness(0.9); }
+
+  .btn-diamond {
+    width: 100%;
+    padding: 14px;
+    border-radius: calc(var(--radius) * 0.75);
+    border: none;
+    font-weight: 800;
+    font-size: 15px;
+    color: #000000;
+    background: var(--diamond);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform 0.1s, filter 0.2s;
+    height: 52px;
+  }
+  .btn-diamond:active { transform: scale(0.97); filter: brightness(0.9); }
 
   .btn-secondary {
     width: 100%;
@@ -220,15 +240,14 @@
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 
-  /* Tab Nav Bar additions for toggling */
   .nav-bar {
     position: fixed;
     bottom: 0; left: 0; right: 0;
     height: calc(var(--nav-h) + var(--safe-bottom));
     padding-bottom: var(--safe-bottom);
     background: var(--nav-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--border);
     z-index: 60;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -265,8 +284,8 @@
     transition: color 0.2s;
   }
   .nav-btn.active { color: var(--primary); }
+  .nav-btn.active-diamond { color: var(--diamond); }
 
-  /* Floating Toggle Button styles */
   .nav-toggle-wrap {
     position: fixed;
     bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
@@ -309,7 +328,12 @@
     margin-bottom: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   }
+  .result-box-diamond {
+    border-color: var(--diamond);
+  }
+  
   .result-val { font-size: 26px; font-weight: 900; color: var(--primary); }
+  .result-val-diamond { color: var(--diamond); }
 
   .tab-bar {
     display: flex;
@@ -333,7 +357,7 @@
   }
   
   .badge {
-    background: var(--primary);
+    background: var(--danger);
     color: #fff;
     font-size: 10px;
     font-weight: 900;
@@ -345,15 +369,15 @@
   }
 </style>
 </head>
-<body class="ios-light">
+<body class="ios-dark">
 
 <header class="header-bar">
   <div class="header-inner">
     <div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:34px;height:34px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;">
-        <i data-lucide="calculator" style="width:18px;height:18px;color:#fff;"></i>
+      <div style="width:34px;height:34px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;" id="header-icon-bg">
+        <i data-lucide="calculator" style="width:18px;height:18px;color:#000;" id="header-icon"></i>
       </div>
-      <div id="nav-title" style="font-weight:900;font-size:15px;color:var(--text);letter-spacing:0.02em;">SHWE CALC</div>
+      <div id="nav-title" style="font-weight:900;font-size:15px;color:var(--primary);letter-spacing:0.02em;">SHWE CALC</div>
     </div>
     <div style="display:flex;align-items:center;gap:16px;">
       <button onclick="toggleBanner()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;" id="toggle-banner-btn">
@@ -362,7 +386,7 @@
       <button onclick="manualRefreshAll()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;" id="refresh-btn">
         <i data-lucide="refresh-cw" style="width:20px;height:20px;"></i>
       </button>
-      <button onclick="cycleTheme()" style="background:none;border:none;color:var(--primary);cursor:pointer;" id="theme-btn">
+      <button onclick="cycleTheme()" style="background:none;border:none;color:var(--text);cursor:pointer;" id="theme-btn">
         <i data-lucide="palette" style="width:20px;height:20px;" id="theme-icon"></i>
       </button>
     </div>
@@ -449,7 +473,7 @@
       </div>
       
       <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px;">
-        <button onclick="addCurrentToInvoice()" class="btn-secondary" style="color:var(--primary);border-color:var(--primary);">
+        <button onclick="addCurrentToInvoice()" class="btn-secondary" style="color:var(--text);border-color:var(--border);">
           <i data-lucide="plus-square" style="width:20px;height:20px;"></i> ဘောင်ချာသို့ ထည့်မည်
         </button>
         <button onclick="shareAsPhoto()" class="btn-primary" style="background:#34c759;color:#fff;">
@@ -527,31 +551,31 @@
           <div class="grid-2">
             <div>
               <div class="card-label">ဈေးနှုန်းသတ်မှတ်ချက်</div>
-              <select id="DiamondPriceType" onchange="updateEquivPrice()" class="inp">
+              <select id="DiamondPriceType" onchange="updateEquivPrice()" class="inp inp-diamond">
                 <option value="carat">၁ ကာရက် ဈေးနှုန်း</option>
                 <option value="ratti">၁ ရတီ ဈေးနှုန်း</option>
               </select>
             </div>
             <div>
               <div class="card-label">ဈေးနှုန်း (ကျပ်)</div>
-              <input type="number" id="DiamondPrice" oninput="updateEquivPrice()" inputmode="numeric" pattern="[0-9]*" placeholder="0" class="inp">
+              <input type="number" id="DiamondPrice" oninput="updateEquivPrice()" inputmode="numeric" pattern="[0-9]*" placeholder="0" class="inp inp-diamond">
             </div>
           </div>
-          <div id="equivPriceDisplay" style="font-size:12px;color:var(--primary);font-weight:700;margin-top:12px;text-align:center;"></div>
+          <div id="equivPriceDisplay" style="font-size:12px;color:var(--diamond);font-weight:700;margin-top:12px;text-align:center;"></div>
         </div>
 
         <div class="card full-width">
           <div class="grid-2">
             <div>
-              <div class="card-label" style="color:var(--primary);">ကာရက် (Carat)</div>
-              <input type="number" id="DCt" oninput="syncDiamondUnits('ct')" inputmode="decimal" step="0.0001" placeholder="0.00" class="inp">
+              <div class="card-label" style="color:var(--diamond);">ကာရက် (Carat)</div>
+              <input type="number" id="DCt" oninput="syncDiamondUnits('ct')" inputmode="decimal" step="0.0001" placeholder="0.00" class="inp inp-diamond">
             </div>
             <div>
-              <div class="card-label" style="color:var(--primary);">ရတီ / ဗြီ / ပိုင်း</div>
+              <div class="card-label" style="color:var(--diamond);">ရတီ / ဗြီ / ပိုင်း</div>
               <div class="grid-3">
-                <input type="number" id="DR" oninput="syncDiamondUnits('unit')" inputmode="numeric" pattern="[0-9]*" placeholder="R" class="inp inp-center">
-                <input type="number" id="DB" oninput="syncDiamondUnits('unit')" inputmode="numeric" pattern="[0-9]*" placeholder="B" class="inp inp-center">
-                <input type="number" id="DP" oninput="syncDiamondUnits('unit')" inputmode="decimal" step="0.01" placeholder="P" class="inp inp-center">
+                <input type="number" id="DR" oninput="syncDiamondUnits('unit')" inputmode="numeric" pattern="[0-9]*" placeholder="R" class="inp inp-center inp-diamond">
+                <input type="number" id="DB" oninput="syncDiamondUnits('unit')" inputmode="numeric" pattern="[0-9]*" placeholder="B" class="inp inp-center inp-diamond">
+                <input type="number" id="DP" oninput="syncDiamondUnits('unit')" inputmode="decimal" step="0.01" placeholder="P" class="inp inp-center inp-diamond">
               </div>
             </div>
           </div>
@@ -559,7 +583,7 @@
       </div>
 
       <div style="margin-top:auto;padding-top:16px;display:flex;flex-direction:column;gap:12px;">
-        <button onclick="calculateDiamondPrice()" class="btn-primary">
+        <button onclick="calculateDiamondPrice()" class="btn-diamond">
           <i data-lucide="gem" style="width:20px;height:20px;"></i> စိန်ဈေးတွက်မည်
         </button>
         <button onclick="resetDiamond()" class="btn-secondary">RESET</button>
@@ -590,10 +614,10 @@
         </div>
 
         <div class="card full-width">
-          <div class="card-label" style="color:var(--primary);">စိန် / ရတနာ (Carat ⇄ Gram)</div>
+          <div class="card-label" style="color:var(--diamond);">စိန် / ရတနာ (Carat ⇄ Gram)</div>
           <div class="grid-2">
-            <input type="number" id="convCt" oninput="convertDiamondUnits('ct')" inputmode="decimal" step="0.01" placeholder="Carat (Ct)" class="inp">
-            <input type="number" id="convGm" oninput="convertDiamondUnits('gm')" inputmode="decimal" step="0.01" placeholder="Gram (g)" class="inp">
+            <input type="number" id="convCt" oninput="convertDiamondUnits('ct')" inputmode="decimal" step="0.01" placeholder="Carat (Ct)" class="inp inp-diamond">
+            <input type="number" id="convGm" oninput="convertDiamondUnits('gm')" inputmode="decimal" step="0.01" placeholder="Gram (g)" class="inp inp-diamond">
           </div>
         </div>
       </div>
@@ -642,7 +666,7 @@
     </div>
 
     <div id="invoice-view" class="view">
-      <div class="card" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;background:var(--primary);color:#fff;">
+      <div class="card" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;background:var(--primary);color:#000;">
         <div style="font-weight:800;font-size:16px;">စုစုပေါင်း ကျသင့်ငွေ</div>
         <div id="invoice-total" style="font-size:22px;font-weight:900;">၀ ကျပ်</div>
       </div>
@@ -879,11 +903,27 @@ function showView(view) {
   const navIds = ['price-calc', 'purity-calc', 'diamond-calc', 'unit-converter', 'net-weight', 'invoice', 'history'];
   navIds.forEach(id => {
     const btn = document.getElementById('nav-' + id);
-    if (btn) btn.classList.remove('active');
+    if (btn) btn.classList.remove('active', 'active-diamond');
   });
 
   const currentNav = document.getElementById('nav-' + view);
-  if (currentNav) currentNav.classList.add('active');
+  const titleEl = document.getElementById('nav-title');
+  const iconBg = document.getElementById('header-icon-bg');
+  const navToggleBtn = document.getElementById('nav-toggle-btn');
+  
+  if (view === 'diamond-calc') {
+    titleEl.textContent = 'DIAMOND CALC';
+    titleEl.style.color = 'var(--diamond)';
+    iconBg.style.background = 'var(--diamond)';
+    navToggleBtn.style.color = 'var(--diamond)';
+    if (currentNav) currentNav.classList.add('active-diamond');
+  } else {
+    titleEl.textContent = 'SHWE CALC';
+    titleEl.style.color = 'var(--primary)';
+    iconBg.style.background = 'var(--primary)';
+    navToggleBtn.style.color = 'var(--primary)';
+    if (currentNav) currentNav.classList.add('active');
+  }
 }
 
 function switchPurityTab(type) {
@@ -987,10 +1027,11 @@ function calculateDiamondPrice() {
     <div style="font-size:14px;color:var(--text-muted);margin-bottom:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">စိန်/ရတနာ တွက်ချက်မှု</div>
     <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:8px;"><span>သတ်မှတ်ဈေး:</span><span style="color:var(--text);font-weight:800;">${price.toLocaleString()}</span></div>
     <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:16px;"><span>အလေးချိန်:</span><span style="font-weight:700;">${ct} Ct (${r}R ${b}B ${p}P)</span></div>
-    <div style="font-size:26px;font-weight:900;color:var(--primary);border-top:1px solid var(--border);padding-top:16px;">${Math.round(total).toLocaleString()} ကျပ်</div>
+    <div style="font-size:26px;font-weight:900;color:var(--diamond);border-top:1px solid var(--border);padding-top:16px;">${Math.round(total).toLocaleString()} ကျပ်</div>
   `;
   
   document.getElementById('res-list').innerHTML = html;
+  document.getElementById('res-list').classList.add('result-box-diamond');
   currentCalcData = { amount: total, summary: `စိန်/ရတနာ (${ct} Ct)` };
   saveToHistory(html);
   showView('price-result');
@@ -1031,6 +1072,7 @@ function calculatePrice() {
   `;
   
   document.getElementById('res-list').innerHTML = html;
+  document.getElementById('res-list').classList.remove('result-box-diamond');
   currentCalcData = { amount: total, summary: `ရွှေ (${pk}K ${pp}P ${py}Y)` };
   saveToHistory(html);
   showView('price-result');
