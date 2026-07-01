@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="my" class="h-full">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" id="theme-meta" content="#f2f2f7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Shwe Calculator Pro</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --nav-h: 60px;
+  }
+  
+  body.ios-light {
+    --bg: #f2f2f7;
+    --surface: #ffffff;
+    --text: #000000;
+    --text-muted: #8e8e93;
+    --primary: #007aff;
+    --danger: #ff3b30;
+    --border: #c6c6c8;
+    --radius: 12px;
+    --nav-bg: rgba(255, 255, 255, 0.85);
+  }
+  body.ios-dark {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --text: #ffffff;
+    --text-muted: #ebebf5;
+    --primary: #0a84ff;
+    --danger: #ff453a;
+    --border: #38383a;
+    --radius: 12px;
+    --nav-bg: rgba(28, 28, 30, 0.85);
+  }
+  body.oneui-light {
+    --bg: #f2f2f2;
+    --surface: #fafafa;
+    --text: #191919;
+    --text-muted: #7b7b7b;
+    --primary: #3e91ff;
+    --danger: #f25555;
+    --border: #e0e0e0;
+    --radius: 24px;
+    --nav-bg: rgba(250, 250, 250, 0.95);
+  }
+  body.oneui-dark {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --text: #f0f0f0;
+    --text-muted: #a0a0a0;
+    --primary: #4a9fff;
+    --danger: #ff6b6b;
+    --border: #2a2a2a;
+    --radius: 24px;
+    --nav-bg: rgba(24, 24, 24, 0.95);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Inter', 'Pyidaungsu', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  input, select { font-size: 16px !important; font-family: inherit; }
+  input:focus, select:focus { outline: none; }
+
+  .header-bar {
+    padding-top: var(--safe-top);
+    background: var(--nav-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    z-index: 50;
+  }
+  
+  .header-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 16px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .main-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 16px calc(var(--nav-h) + var(--safe-bottom) + 32px) 16px;
+  }
+
+  .content-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+  }
+
+  .banner-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .banner-wrapper { transition: opacity 0.3s; flex-shrink: 0; }
+  .banner-wrapper.hidden-completely { display: none; }
+
+  .source-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 6px;
+  }
+
+  .view { display: none; height: 100%; flex-direction: column; animation: fadeIn 0.2s ease-out; }
+  .view.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .responsive-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  @media (min-width: 600px) {
+    .responsive-grid { grid-template-columns: 1fr 1fr; }
+    .full-width { grid-column: 1 / -1; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+  }
+
+  .card-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .inp {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: calc(var(--radius) * 0.75);
+    color: var(--text);
+    padding: 12px 14px;
+    font-weight: 700;
+    transition: border-color 0.2s;
+    height: 48px;
+  }
+  .inp:focus { border-color: var(--primary); }
+  .inp-center { text-align: center; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    border-radius: calc(var(--radius) * 0.75);
+    border: none;
+    font-weight: 800;
+    font-size: 15px;
+    color: #ffffff;
+    background: var(--primary);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform 0.1s, filter 0.2s;
+    height: 52px;
+  }
+  .btn-primary:active { transform: scale(0.97); filter: brightness(0.9); }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-weight: 700;
+    border-radius: calc(var(--radius) * 0.75);
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer;
+  }
+  .btn-secondary:active { transform: scale(0.97); background: var(--bg); }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+  .nav-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: calc(var(--nav-h) + var(--safe-bottom));
+    padding-bottom: var(--safe-bottom);
+    background: var(--nav-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    z-index: 60;
+  }
+
+  .nav-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    height: var(--nav-h);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  
+  .nav-btn {
+    flex: 1;
+    min-width: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 10px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .nav-btn.active { color: var(--primary); }
+
+  .history-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  .history-item:last-child { margin-bottom: 0; }
+
+  .result-box {
+    background: var(--surface);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  .result-val { font-size: 26px; font-weight: 900; color: var(--primary); }
+
+  .tab-bar {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 0.75);
+    padding: 4px;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    flex: 1; padding: 10px; border-radius: calc(var(--radius) * 0.6); border: none; font-weight: 700; font-size: 13px; color: var(--text-muted); background: transparent; cursor: pointer; transition: 0.2s;
+  }
+  .tab-btn.active { background: var(--surface); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+  
+  .badge {
+    background: var(--primary);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 10px;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+  }
+</style>
+</head>
+<body class="ios-light">
+
+<header class="header-bar">
+  <div class="header-inner">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:34px;height:34px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;">
+        <i data-lucide="calculator" style="width:18px;height:18px;color:#fff;"></i>
+      </div>
+      <div id="nav-title" style="font-weight:900;font-size:15px;color:var(--text);letter-spacing:0.02em;">SHWE CALC</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <button onclick="toggleBanner()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;" id="toggle-banner-btn">
+        <i data-lucide="eye-off" style="width:20px;height:20px;"></i>
+      </button>
+      <button onclick="manualRefreshAll()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;" id="refresh-btn">
+        <i data-lucide="refresh-cw" style="width:20px;height:20px;"></i>
+      </button>
+      <button onclick="cycleTheme()" style="background:none;border:none;color:var(--primary);cursor:pointer;" id="theme-btn">
+        <i data-lucide="palette" style="width:20px;height:20px;" id="theme-icon"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="main-scroll-area">
+  <div class="content-wrapper">
+
+    <div id="banner-wrapper" class="banner-wrapper">
+      <div class="banner-card">
+        <button onclick="toggleBanner()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text-muted);cursor:pointer;">
+          <i data-lucide="x" style="width:16px;height:16px;"></i>
+        </button>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <i data-lucide="trending-up" style="width:16px;height:16px;color:var(--primary);"></i>
+          <span style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;">XAU/USD Live</span>
+        </div>
+        <div id="main-price-display" style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em;">Loading...</div>
+        
+        <div class="source-row">
+          <span style="background:var(--bg);color:var(--text);padding:4px 8px;border-radius:6px;font-weight:800;border:1px solid var(--border);">PAXG</span>
+          <span style="flex:1;font-weight:600;color:var(--text-muted);">Binance</span>
+          <span id="price-binance" style="font-weight:800;color:var(--text);">—</span>
+        </div>
+        <div class="source-row">
+          <span style="background:var(--bg);color:var(--text);padding:4px 8px;border-radius:6px;font-weight:800;border:1px solid var(--border);">XAUT</span>
+          <span style="flex:1;font-weight:600;color:var(--text-muted);">CoinGecko</span>
+          <span id="price-coingecko" style="font-weight:800;color:var(--text);">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="price-calc-view" class="view active">
+      <div class="responsive-grid">
+        <div class="card full-width">
+          <div class="card-label"><i data-lucide="circle-dollar-sign" style="width:16px;height:16px;"></i> ယနေ့ပေါက်ဈေး (ကျပ်)</div>
+          <input type="number" id="GoldPrice" inputmode="numeric" pattern="[0-9]*" placeholder="0" class="inp" style="font-size:22px !important;font-weight:800;text-align:center;height:56px;">
+        </div>
+
+        <div class="card">
+          <div class="card-label"><i data-lucide="scale" style="width:16px;height:16px;"></i> ရွှေအလေးချိန်</div>
+          <div class="grid-3">
+            <input type="number" id="PKat" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
+            <input type="number" id="PPe" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
+            <input type="number" id="PYway" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label" style="color:var(--danger);"><i data-lucide="trending-down" style="width:16px;height:16px;"></i> အလျော့တွက်</div>
+          <div class="grid-3">
+            <input type="number" id="RKat" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
+            <input type="number" id="RPae" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
+            <input type="number" id="RYway" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center">
+          </div>
+        </div>
+
+        <div class="card full-width">
+          <div class="grid-2">
+            <div>
+              <div class="card-label">လက်ခ (ကျပ်)</div>
+              <input type="number" id="Smith" inputmode="numeric" pattern="[0-9]*" placeholder="0" class="inp">
+            </div>
+            <div>
+              <div class="card-label">ကျောက်ဖိုး (ကျပ်)</div>
+              <input type="number" id="StonePrice" inputmode="numeric" pattern="[0-9]*" placeholder="0" class="inp">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:auto;padding-top:16px;display:flex;flex-direction:column;gap:12px;">
+        <button onclick="calculatePrice()" class="btn-primary">
+          <i data-lucide="calculator" style="width:20px;height:20px;"></i> တွက်ချက်မည်
+        </button>
+        <button onclick="resetCalculator()" class="btn-secondary">အကုန်ဖျက်မည် (RESET)</button>
+      </div>
+    </div>
+
+    <div id="price-result-view" class="view">
+      <div id="capture-area" style="background:var(--bg);padding-bottom:12px;border-radius:var(--radius);">
+        <div class="result-box" id="res-list"></div>
+      </div>
+      
+      <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px;">
+        <button onclick="addCurrentToInvoice()" class="btn-secondary" style="color:var(--primary);border-color:var(--primary);">
+          <i data-lucide="plus-square" style="width:20px;height:20px;"></i> ဘောင်ချာသို့ ထည့်မည်
+        </button>
+        <button onclick="shareAsPhoto()" class="btn-primary" style="background:#34c759;color:#fff;">
+          <i data-lucide="share" style="width:20px;height:20px;"></i> မျှဝေမည် (Share)
+        </button>
+        <button onclick="showView('price-calc')" class="btn-secondary">နောက်သို့ ပြန်သွားမည်</button>
+      </div>
+    </div>
+
+    <div id="purity-calc-view" class="view">
+      <div class="tab-bar">
+        <button id="tab-purity" class="tab-btn active" onclick="switchPurityTab('purity')">အရည်အသွေးတွက်</button>
+        <button id="tab-yield" class="tab-btn" onclick="switchPurityTab('yield')">အသားတင်ထွက်နှုန်း</button>
+      </div>
+
+      <div class="card" style="margin-bottom:12px;background:var(--bg);">
+        <div style="display:flex;align-items:center;gap:6px;color:var(--primary);font-weight:800;font-size:12px;margin-bottom:8px;">
+          <i data-lucide="info" style="width:16px;height:16px;"></i> Density အညွှန်းကိန်းများ
+        </div>
+        <p style="font-size:13px;line-height:1.6;font-weight:600;color:var(--text);">၁၆ပဲရည် ရွှေတစ်ကျပ်သားတွင် <b style="color:var(--primary)">19.25</b> Density ရှိပြီး ၁၅ပဲရည်သည် <b style="color:var(--primary)">17.8</b> Density ဖြစ်ပါသည်။</p>
+      </div>
+
+      <div id="purity-sub-view" class="responsive-grid">
+        <div class="card">
+          <div class="card-label">အထည်ပျက် အလေးချိန်</div>
+          <div class="grid-3">
+            <input type="number" id="p1-k" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
+            <input type="number" id="p1-p" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
+            <input type="number" id="p1-y" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center">
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">ချွတ်ပြီးရရှိသော အခေါက်ရွှေ</div>
+          <div class="grid-3">
+            <input type="number" id="p2-k" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
+            <input type="number" id="p2-p" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
+            <input type="number" id="p2-y" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center">
+          </div>
+        </div>
+      </div>
+
+      <div id="yield-sub-view" class="responsive-grid" style="display:none;">
+        <div class="card full-width">
+          <div class="card-label">အထည်ပျက် အလေးချိန်</div>
+          <div class="grid-3">
+            <input type="number" id="y1-k" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
+            <input type="number" id="y1-p" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
+            <input type="number" id="y1-y" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center">
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Density (စက်ပွိုင့်)</div>
+          <input type="number" id="y-den" inputmode="decimal" step="0.01" placeholder="ဥပမာ- 17.51" class="inp">
+        </div>
+        <div class="card">
+          <div class="card-label">ပဲရည် သိလျှင်ရိုက်ထည့်ပါ</div>
+          <input type="number" id="y-pe" inputmode="decimal" step="0.01" placeholder="ဥပမာ- 14.5" class="inp">
+        </div>
+      </div>
+
+      <div id="purity-result" class="result-box" style="display:none;margin-top:16px;">
+        <div class="card-label" style="justify-content:center;" id="p-res-label">ရလဒ်</div>
+        <div id="p-res-val" class="result-val">0.00</div>
+        <div id="p-res-detail" style="font-size:13px;margin-top:8px;color:var(--text-muted);font-weight:600;">-</div>
+      </div>
+
+      <div style="margin-top:auto;padding-top:16px;">
+        <button onclick="calcPurityAction()" class="btn-primary">တွက်မည်</button>
+      </div>
+    </div>
+
+    <div id="diamond-calc-view" class="view">
+      <div class="responsive-grid">
+        <div class="card full-width">
+          <div class="grid-2">
+            <div>
+              <div class="card-label">ဈေးနှုန်းသတ်မှတ်ချက်</div>
+              <select id="DiamondPriceType" onchange="updateEquivPrice()" class="inp">
+                <option value="carat">၁ ကာရက် ဈေးနှုန်း</option>
+                <option value="ratti">၁ ရတီ ဈေးနှုန်း</option>
+              </select>
+            </div>
+            <div>
+              <div class="card-label">ဈေးနှုန်း (ကျပ်)</div>
+              <input type="number" id="DiamondPrice" oninput="updateEquivPrice()" inputmode="numeric" pattern="[0-9]*" placeholder="0" class="inp">
+            </div>
+          </div>
+          <div id="equivPriceDisplay" style="font-size:12px;color:var(--primary);font-weight:700;margin-top:12px;text-align:center;"></div>
+        </div>
+
+        <div class="card full-width">
+          <div class="grid-2">
+            <div>
+              <div class="card-label" style="color:var(--primary);">ကာရက် (Carat)</div>
+              <input type="number" id="DCt" oninput="syncDiamondUnits('ct')" inputmode="decimal" step="0.0001" placeholder="0.00" class="inp">
+            </div>
+            <div>
+              <div class="card-label" style="color:var(--primary);">ရတီ / ဗြီ / ပိုင်း</div>
+              <div class="grid-3">
+                <input type="number" id="DR" oninput="syncDiamondUnits('unit')" inputmode="numeric" pattern="[0-9]*" placeholder="R" class="inp inp-center">
+                <input type="number" id="DB" oninput="syncDiamondUnits('unit')" inputmode="numeric" pattern="[0-9]*" placeholder="B" class="inp inp-center">
+                <input type="number" id="DP" oninput="syncDiamondUnits('unit')" inputmode="decimal" step="0.01" placeholder="P" class="inp inp-center">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:auto;padding-top:16px;display:flex;flex-direction:column;gap:12px;">
+        <button onclick="calculateDiamondPrice()" class="btn-primary">
+          <i data-lucide="gem" style="width:20px;height:20px;"></i> စိန်ဈေးတွက်မည်
+        </button>
+        <button onclick="resetDiamond()" class="btn-secondary">RESET</button>
+      </div>
+    </div>
+
+    <div id="unit-converter-view" class="view">
+      <div class="responsive-grid">
+        <div class="card full-width">
+          <div class="grid-2">
+            <div>
+              <div class="card-label">ဂရမ် (Grams)</div>
+              <input type="number" id="gramsInput" inputmode="decimal" step="0.01" placeholder="0.00" class="inp">
+            </div>
+            <div>
+              <div class="card-label">စံသတ်မှတ်ချက်</div>
+              <select id="standard" onchange="convertUnits('grams')" class="inp">
+                <option value="16.329325">Official (16.33g)</option>
+                <option value="16.606">Traditional (16.61g)</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-3" style="margin-top:12px;">
+            <input type="number" id="uKyat" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
+            <input type="number" id="uPe" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
+            <input type="number" id="uYway" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center">
+          </div>
+        </div>
+
+        <div class="card full-width">
+          <div class="card-label" style="color:var(--primary);">စိန် / ရတနာ (Carat ⇄ Gram)</div>
+          <div class="grid-2">
+            <input type="number" id="convCt" oninput="convertDiamondUnits('ct')" inputmode="decimal" step="0.01" placeholder="Carat (Ct)" class="inp">
+            <input type="number" id="convGm" oninput="convertDiamondUnits('gm')" inputmode="decimal" step="0.01" placeholder="Gram (g)" class="inp">
+          </div>
+        </div>
+      </div>
+
+      <div class="result-box" style="margin-top:16px;">
+        <div class="card-label" style="justify-content:center;">ရွှေအလေးချိန် ရလဒ်</div>
+        <div id="uDisplay" class="result-val">၀ ကျပ် ၀ ပဲ ၀ ရွေး</div>
+        <div id="uSubDisplay" style="font-size:13px;margin-top:8px;color:var(--text-muted);font-weight:600;">(0.0000 ကျပ်) | 0.000 g</div>
+      </div>
+      
+      <div style="margin-top:auto;padding-top:16px;">
+        <button onclick="resetConverter()" class="btn-secondary">RESET</button>
+      </div>
+    </div>
+
+    <div id="net-weight-view" class="view">
+      <div class="responsive-grid">
+        <div class="card full-width">
+          <div class="card-label" style="color:#34c759;"><i data-lucide="plus-circle" style="width:16px;height:16px;"></i> စုစုပေါင်းအလေးချိန်</div>
+          <div class="grid-3">
+            <input type="number" id="TKat" oninput="calculateNetWeight()" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
+            <input type="number" id="TPe" oninput="calculateNetWeight()" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
+            <input type="number" id="TYway" oninput="calculateNetWeight()" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center">
+          </div>
+        </div>
+
+        <div class="card full-width">
+          <div class="card-label" style="color:var(--danger);"><i data-lucide="minus-circle" style="width:16px;height:16px;"></i> နှုတ်မည့်အလေးချိန်</div>
+          <div class="grid-3">
+            <input type="number" id="SKat" oninput="calculateNetWeight()" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
+            <input type="number" id="SPe" oninput="calculateNetWeight()" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
+            <input type="number" id="SYway" oninput="calculateNetWeight()" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center">
+          </div>
+        </div>
+      </div>
+
+      <div class="result-box" style="margin-top:16px;">
+        <div class="card-label" style="justify-content:center;">အသားတင်ရွှေအလေးချိန်</div>
+        <div id="netDisplay" class="result-val">၀ ကျပ် ၀ ပဲ ၀ ရွေး</div>
+        <div id="netSubDisplay" style="font-size:13px;margin-top:8px;color:var(--text-muted);font-weight:600;">(0.0000 ကျပ်)</div>
+      </div>
+
+      <div style="margin-top:auto;padding-top:16px;">
+        <button onclick="resetNetWeight()" class="btn-secondary">RESET</button>
+      </div>
+    </div>
+
+    <div id="invoice-view" class="view">
+      <div class="card" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;background:var(--primary);color:#fff;">
+        <div style="font-weight:800;font-size:16px;">စုစုပေါင်း ကျသင့်ငွေ</div>
+        <div id="invoice-total" style="font-size:22px;font-weight:900;">၀ ကျပ်</div>
+      </div>
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="card-label" style="margin:0;"><i data-lucide="list" style="width:16px;height:16px;"></i> ဘောင်ချာစာရင်း</div>
+        <button onclick="clearInvoice()" style="background:none;border:none;color:var(--danger);font-weight:700;font-size:12px;cursor:pointer;">Clear All</button>
+      </div>
+
+      <div id="invoice-list-area" style="flex:1;overflow-y:auto;padding-bottom:12px;">
+        <div id="invoice-list"></div>
+      </div>
+
+      <div style="margin-top:auto;padding-top:16px;display:flex;flex-direction:column;gap:12px;">
+        <button onclick="shareInvoice()" class="btn-primary" style="background:#34c759;color:#fff;">
+          <i data-lucide="share" style="width:20px;height:20px;"></i> ဘောင်ချာ မျှဝေမည် (Share)
+        </button>
+      </div>
+    </div>
+
+    <div id="history-view" class="view">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="card-label" style="margin:0;"><i data-lucide="history" style="width:16px;height:16px;"></i> မှတ်တမ်းများ</div>
+        <button onclick="clearAllHistory()" style="background:none;border:none;color:var(--danger);font-weight:700;font-size:12px;cursor:pointer;">Clear All</button>
+      </div>
+      <div id="history-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
+  </div>
+</div>
+
+<nav class="nav-bar" id="nav-bar">
+  <div class="nav-inner">
+    <button onclick="showView('price-calc')" id="nav-price-calc" class="nav-btn active">
+      <i data-lucide="coins" style="width:22px;height:22px;"></i>
+      <span>ရွှေဈေး</span>
+    </button>
+    <button onclick="showView('purity-calc')" id="nav-purity-calc" class="nav-btn">
+      <i data-lucide="flask-conical" style="width:22px;height:22px;"></i>
+      <span>အခေါက်</span>
+    </button>
+    <button onclick="showView('diamond-calc')" id="nav-diamond-calc" class="nav-btn">
+      <i data-lucide="gem" style="width:22px;height:22px;"></i>
+      <span>စိန်/ရတနာ</span>
+    </button>
+    <button onclick="showView('unit-converter')" id="nav-unit-converter" class="nav-btn">
+      <i data-lucide="refresh-cw" style="width:22px;height:22px;"></i>
+      <span>ယူနစ်</span>
+    </button>
+    <button onclick="showView('net-weight')" id="nav-net-weight" class="nav-btn">
+      <i data-lucide="layers" style="width:22px;height:22px;"></i>
+      <span>အသားတင်</span>
+    </button>
+    <button onclick="showView('invoice')" id="nav-invoice" class="nav-btn" style="position:relative;">
+      <i data-lucide="file-text" style="width:22px;height:22px;"></i>
+      <span>ဘောင်ချာ</span>
+      <span id="invoice-badge" class="badge" style="display:none;">0</span>
+    </button>
+    <button onclick="showView('history')" id="nav-history" class="nav-btn">
+      <i data-lucide="history" style="width:22px;height:22px;"></i>
+      <span>မှတ်တမ်း</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(e => console.log(e));
+  });
+}
+
+let bannerVisible = true;
+let goldPrices = {};
+let calcHistory = JSON.parse(localStorage.getItem('calcHistory') || '[]');
+let invoiceList = JSON.parse(localStorage.getItem('invoiceList') || '[]');
+let currentCalcData = null;
+
+const themes = ['ios-light', 'ios-dark', 'oneui-light', 'oneui-dark'];
+let currentThemeIndex = 0;
+
+function toggleBanner() {
+  const wrapper = document.getElementById('banner-wrapper');
+  const icon = document.querySelector('#toggle-banner-btn i');
+  bannerVisible = !bannerVisible;
+  if (!bannerVisible) {
+    wrapper.classList.add('hidden-completely');
+    icon.setAttribute('data-lucide', 'eye');
+    localStorage.setItem('bannerVisible', 'false');
+  } else {
+    wrapper.classList.remove('hidden-completely');
+    icon.setAttribute('data-lucide', 'eye-off');
+    localStorage.setItem('bannerVisible', 'true');
+  }
+  lucide.createIcons();
+}
+
+function cycleTheme() {
+  document.body.classList.remove(themes[currentThemeIndex]);
+  currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+  document.body.classList.add(themes[currentThemeIndex]);
+  localStorage.setItem('appThemeIndex', currentThemeIndex);
+  updateThemeMeta();
+}
+
+function updateThemeMeta() {
+  const meta = document.getElementById('theme-meta');
+  const styles = window.getComputedStyle(document.body);
+  meta.setAttribute('content', styles.getPropertyValue('--bg').trim());
+}
+
+async function fetchBinance() {
+  try {
+    const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT');
+    const d = await r.json();
+    const p = parseFloat(d.lastPrice);
+    goldPrices.binance = { price: p };
+    document.getElementById('price-binance').textContent = '$' + p.toFixed(2);
+    return { price: p };
+  } catch(e) {
+    document.getElementById('price-binance').textContent = 'Error';
+    return null;
+  }
+}
+
+async function fetchCoinGecko() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=usd');
+    const d = await r.json();
+    const item = d && d['tether-gold'];
+    if (item) {
+      const p = parseFloat(item.usd);
+      goldPrices.coingecko = { price: p };
+      document.getElementById('price-coingecko').textContent = '$' + p.toFixed(2);
+      return { price: p };
+    }
+    throw new Error();
+  } catch(e) {
+    document.getElementById('price-coingecko').textContent = 'Error';
+    return null;
+  }
+}
+
+function updateBannerSummary() {
+  const prices = Object.values(goldPrices).map(x => x.price).filter(p => p && p > 0);
+  if (prices.length === 0) return;
+  const avg = prices.reduce((a,b)=>a+b,0) / prices.length;
+  document.getElementById('main-price-display').textContent = '$' + avg.toFixed(2);
+}
+
+async function fetchGoldPrice() {
+  const icon = document.querySelector('#refresh-btn i');
+  icon.style.transform = 'rotate(180deg)';
+  icon.style.transition = 'transform 0.5s';
+  await Promise.allSettled([fetchBinance(), fetchCoinGecko()]);
+  updateBannerSummary();
+  setTimeout(() => { icon.style.transform = 'rotate(0deg)'; }, 500);
+}
+
+function manualRefreshAll() {
+  goldPrices = {};
+  document.getElementById('price-binance').textContent = '...';
+  document.getElementById('price-coingecko').textContent = '...';
+  document.getElementById('main-price-display').textContent = 'Loading...';
+  fetchGoldPrice();
+}
+
+const allInputs = document.querySelectorAll('input, select');
+allInputs.forEach(input => {
+  input.addEventListener('input', () => { 
+    if (input.id) localStorage.setItem(input.id, input.value); 
+  });
+});
+
+window.onload = () => {
+  const savedIndex = localStorage.getItem('appThemeIndex');
+  if (savedIndex !== null) {
+    document.body.classList.remove(themes[currentThemeIndex]);
+    currentThemeIndex = parseInt(savedIndex) % themes.length;
+    document.body.classList.add(themes[currentThemeIndex]);
+  }
+  updateThemeMeta();
+
+  const savedBanner = localStorage.getItem('bannerVisible');
+  if (savedBanner === 'false') {
+    bannerVisible = true;
+    toggleBanner();
+  }
+
+  allInputs.forEach(input => {
+    const val = localStorage.getItem(input.id);
+    if (val && input.id) input.value = val;
+  });
+
+  calculateNetWeight();
+  updateEquivPrice();
+  fetchGoldPrice();
+  renderHistory();
+  renderInvoice();
+  setInterval(fetchGoldPrice, 300000);
+  lucide.createIcons();
+};
+
+function showView(view) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById(view + '-view');
+  if (target) target.classList.add('active');
+
+  const navIds = ['price-calc', 'purity-calc', 'diamond-calc', 'unit-converter', 'net-weight', 'invoice', 'history'];
+  navIds.forEach(id => {
+    const btn = document.getElementById('nav-' + id);
+    if (btn) btn.classList.remove('active');
+  });
+
+  const currentNav = document.getElementById('nav-' + view);
+  if (currentNav) currentNav.classList.add('active');
+}
+
+function switchPurityTab(type) {
+  const tabPurity = document.getElementById('tab-purity');
+  const tabYield = document.getElementById('tab-yield');
+  const pSub = document.getElementById('purity-sub-view');
+  const ySub = document.getElementById('yield-sub-view');
+  
+  if (type === 'purity') {
+    tabPurity.classList.add('active'); 
+    tabYield.classList.remove('active');
+    pSub.style.display = 'grid'; 
+    ySub.style.display = 'none';
+  } else {
+    tabYield.classList.add('active'); 
+    tabPurity.classList.remove('active');
+    ySub.style.display = 'grid'; 
+    pSub.style.display = 'none';
+  }
+  document.getElementById('purity-result').style.display = 'none';
+}
+
+function toDecimal(k, p, y) { 
+  return (parseFloat(k)||0) + ((parseFloat(p)||0)/16) + ((parseFloat(y)||0)/128); 
+}
+
+function fromDecimal(decimal) {
+  let k = Math.floor(decimal + 0.0000001);
+  let remPe = (decimal - k) * 16;
+  let p = Math.floor(remPe + 0.0000001);
+  let y = parseFloat(((remPe - p) * 8).toFixed(2));
+  if (y >= 8) { p++; y = 0; }
+  if (p >= 16) { k++; p = 0; }
+  return `${k} ကျပ် ${p} ပဲ ${y} ရွေး`;
+}
+
+function calcPurityAction() {
+  const type = document.getElementById('tab-purity').classList.contains('active') ? 'purity' : 'yield';
+  if (type === 'purity') {
+    let raw = toDecimal(document.getElementById('p1-k').value, document.getElementById('p1-p').value, document.getElementById('p1-y').value);
+    let pure = toDecimal(document.getElementById('p2-k').value, document.getElementById('p2-p').value, document.getElementById('p2-y').value);
+    if (raw <= 0 || pure <= 0) return alert("အလေးချိန်မှန်ကန်စွာထည့်ပါ။");
+    let peYee = (pure / raw) * 16;
+    let density = (pure / raw) * 19.32;
+    document.getElementById('purity-result').style.display = 'block';
+    document.getElementById('p-res-label').innerText = "တွက်ချက်ရရှိသော ရွှေအရည်အသွေး";
+    document.getElementById('p-res-val').innerText = `${peYee.toFixed(2)} ပဲရည်`;
+    document.getElementById('p-res-detail').innerText = `Density (စက်ပွိုင့်): ${density.toFixed(2)}`;
+  } else {
+    let raw = toDecimal(document.getElementById('y1-k').value, document.getElementById('y1-p').value, document.getElementById('y1-y').value);
+    let den = parseFloat(document.getElementById('y-den').value);
+    let pe = parseFloat(document.getElementById('y-pe').value);
+    let resultKyat = 0;
+    if (den > 0) resultKyat = (den / 19.32) * raw;
+    else if (pe > 0) resultKyat = (pe / 16) * raw;
+    else return alert("Density (သို့မဟုတ်) ပဲရည် တစ်ခုခုထည့်ပါ။");
+    document.getElementById('purity-result').style.display = 'block';
+    document.getElementById('p-res-label').innerText = "ပြန်ရမည့် အခေါက်ရွှေပမာဏ";
+    document.getElementById('p-res-val').innerText = fromDecimal(resultKyat);
+    document.getElementById('p-res-detail').innerText = `စုစုပေါင်းဒသမကိန်း: ${resultKyat.toFixed(6)} ကျပ်`;
+  }
+}
+
+function updateEquivPrice() {
+  const price = parseFloat(document.getElementById('DiamondPrice').value) || 0;
+  const type = document.getElementById('DiamondPriceType').value;
+  const display = document.getElementById('equivPriceDisplay');
+  if (price === 0) { display.innerText = ""; return; }
+  if (type === 'carat') display.innerText = `≈ ${Math.round(price / 1.1).toLocaleString()} ကျပ် (၁ ရတီလျှင်)`;
+  else display.innerText = `≈ ${Math.round(price * 1.1).toLocaleString()} ကျပ် (၁ ကာရက်လျှင်)`;
+}
+
+function syncDiamondUnits(mode) {
+  let dr = document.getElementById('DR'), db = document.getElementById('DB'), dp = document.getElementById('DP'), dct = document.getElementById('DCt');
+  if (mode === 'ct') {
+    const ct = parseFloat(dct.value) || 0;
+    const totalRatti = ct * 1.1;
+    const r = Math.floor(totalRatti + 0.00001);
+    const remB = (totalRatti - r) * 20;
+    const b = Math.floor(remB + 0.00001);
+    const p = parseFloat(((remB - b) * 8).toFixed(2));
+    dr.value = r || ""; db.value = b || ""; dp.value = p > 0 ? p : "";
+  } else {
+    let r = parseFloat(dr.value) || 0, b = parseFloat(db.value) || 0, p = parseFloat(dp.value) || 0;
+    if (p >= 8) { b += Math.floor(p / 8); p = parseFloat((p % 8).toFixed(2)); db.value = b; dp.value = p > 0 ? p : ""; }
+    if (b >= 20) { r += Math.floor(b / 20); b = b % 20; dr.value = r; db.value = b > 0 ? b : ""; }
+    const totalRatti = r + (b / 20) + (p / 160);
+    dct.value = (totalRatti / 1.1).toFixed(4);
+  }
+}
+
+function calculateDiamondPrice() {
+  const price = parseFloat(document.getElementById('DiamondPrice').value) || 0;
+  const type = document.getElementById('DiamondPriceType').value;
+  const ct = parseFloat(document.getElementById('DCt').value) || 0;
+  const r = parseFloat(document.getElementById('DR').value) || 0, b = parseFloat(document.getElementById('DB').value) || 0, p = parseFloat(document.getElementById('DP').value) || 0;
+  const totalRatti = r + (b / 20) + (p / 160);
+  let total = (type === 'carat') ? (ct * price) : (totalRatti * price);
+  
+  let html = `
+    <div style="font-size:14px;color:var(--text-muted);margin-bottom:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">စိန်/ရတနာ တွက်ချက်မှု</div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:8px;"><span>သတ်မှတ်ဈေး:</span><span style="color:var(--text);font-weight:800;">${price.toLocaleString()}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:16px;"><span>အလေးချိန်:</span><span style="font-weight:700;">${ct} Ct (${r}R ${b}B ${p}P)</span></div>
+    <div style="font-size:26px;font-weight:900;color:var(--primary);border-top:1px solid var(--border);padding-top:16px;">${Math.round(total).toLocaleString()} ကျပ်</div>
+  `;
+  
+  document.getElementById('res-list').innerHTML = html;
+  currentCalcData = { amount: total, summary: `စိန်/ရတနာ (${ct} Ct)` };
+  saveToHistory(html);
+  showView('price-result');
+}
+
+function calculatePrice() {
+  const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+  const price = getVal('GoldPrice');
+  const pk = getVal('PKat'), pp = getVal('PPe'), py = getVal('PYway');
+  const rk = getVal('RKat'), rp = getVal('RPae'), ry = getVal('RYway');
+  const goldKyat = toDecimal(pk, pp, py), redKyat = toDecimal(rk, rp, ry);
+  const smith = getVal('Smith'), stone = getVal('StonePrice');
+  const total = (goldKyat * price) + (redKyat * price) + smith + stone;
+  
+  let html = `
+    <div style="font-size:14px;color:var(--text-muted);margin-bottom:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">ရွှေတွက်ချက်မှု</div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:8px;">
+      <span>ယနေ့ဈေး:</span><span style="color:var(--text);font-weight:800;">${price.toLocaleString()}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:4px;">
+      <span>ရွှေဖိုး:</span><span style="font-weight:800;">${Math.round(goldKyat * price).toLocaleString()}</span>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);text-align:left;margin-bottom:12px;font-weight:600;">
+      (အလေးချိန်: ${pk} ကျပ် ${pp} ပဲ ${py} ရွေး)
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:4px;">
+      <span>လျော့တွက်ဖိုး:</span><span style="font-weight:800;">${Math.round(redKyat * price).toLocaleString()}</span>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);text-align:left;margin-bottom:12px;font-weight:600;">
+      (အလေးချိန်: ${rk} ကျပ် ${rp} ပဲ ${ry} ရွေး)
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:16px;">
+      <span>လက်ခ+ကျောက်:</span><span style="font-weight:800;">${(smith + stone).toLocaleString()}</span>
+    </div>
+    <div style="font-size:26px;font-weight:900;color:var(--primary);border-top:1px solid var(--border);padding-top:16px;">
+      ${Math.round(total).toLocaleString()} ကျပ်
+    </div>
+  `;
+  
+  document.getElementById('res-list').innerHTML = html;
+  currentCalcData = { amount: total, summary: `ရွှေ (${pk}K ${pp}P ${py}Y)` };
+  saveToHistory(html);
+  showView('price-result');
+}
+
+function saveToHistory(html) {
+  let scaledHtml = html
+    .replace(/font-size:26px/g, 'font-size:20px')
+    .replace(/font-size:15px/g, 'font-size:14px')
+    .replace(/margin-bottom:16px/g, 'margin-bottom:10px')
+    .replace(/padding-top:16px/g, 'padding-top:10px');
+
+  calcHistory.unshift({ id: Date.now(), html: scaledHtml });
+  if (calcHistory.length > 50) calcHistory.pop();
+  localStorage.setItem('calcHistory', JSON.stringify(calcHistory));
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (!calcHistory.length) {
+    list.innerHTML = `<div class="card" style="text-align:center;color:var(--text-muted);font-weight:600;">မှတ်တမ်းမရှိသေးပါ</div>`;
+    return;
+  }
+  list.innerHTML = calcHistory.map((item, idx) => `
+    <div class="history-item" style="display:flex;align-items:flex-start;gap:12px;position:relative;">
+      <div style="flex:1;">${item.html}</div>
+      <button onclick="deleteHistoryItem(${idx})" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+      </button>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+function deleteHistoryItem(idx) {
+  calcHistory.splice(idx, 1);
+  localStorage.setItem('calcHistory', JSON.stringify(calcHistory));
+  renderHistory();
+}
+
+function clearAllHistory() {
+  calcHistory = [];
+  localStorage.setItem('calcHistory', JSON.stringify(calcHistory));
+  renderHistory();
+}
+
+function addCurrentToInvoice() {
+  if(!currentCalcData) return;
+  invoiceList.push({
+    id: Date.now(),
+    title: currentCalcData.summary,
+    amount: currentCalcData.amount
+  });
+  localStorage.setItem('invoiceList', JSON.stringify(invoiceList));
+  renderInvoice();
+  
+  const badge = document.getElementById('invoice-badge');
+  badge.style.display = 'block';
+  badge.style.animation = 'none';
+  badge.offsetHeight; 
+  badge.style.animation = 'fadeIn 0.3s ease-out';
+}
+
+function renderInvoice() {
+  const list = document.getElementById('invoice-list');
+  const totalEl = document.getElementById('invoice-total');
+  const badge = document.getElementById('invoice-badge');
+  
+  if(invoiceList.length > 0) {
+    badge.innerText = invoiceList.length;
+    badge.style.display = 'block';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  if(!invoiceList.length) {
+    list.innerHTML = `<div class="card" style="text-align:center;color:var(--text-muted);font-weight:600;">ဘောင်ချာစာရင်း မရှိသေးပါ</div>`;
+    totalEl.innerText = "၀ ကျပ်";
+    return;
+  }
+  let total = 0;
+  list.innerHTML = invoiceList.map((item, idx) => {
+    total += item.amount;
+    return `
+    <div class="card" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;padding:14px;">
+      <div>
+        <div style="font-weight:700;font-size:14px;color:var(--text-muted);">${item.title}</div>
+        <div style="font-weight:800;color:var(--text);font-size:16px;margin-top:6px;">${Math.round(item.amount).toLocaleString()} ကျပ်</div>
+      </div>
+      <button onclick="deleteInvoiceItem(${idx})" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <i data-lucide="minus-circle" style="width:18px;height:18px;"></i>
+      </button>
+    </div>
+    `;
+  }).join('');
+  totalEl.innerText = `${Math.round(total).toLocaleString()} ကျပ်`;
+  lucide.createIcons();
+}
+
+function deleteInvoiceItem(idx) {
+  invoiceList.splice(idx, 1);
+  localStorage.setItem('invoiceList', JSON.stringify(invoiceList));
+  renderInvoice();
+}
+
+function clearInvoice() {
+  invoiceList = [];
+  localStorage.setItem('invoiceList', JSON.stringify(invoiceList));
+  renderInvoice();
+}
+
+function calculateNetWeight() {
+  const tk = parseFloat(document.getElementById('TKat').value) || 0, tp = parseFloat(document.getElementById('TPe').value) || 0, ty = parseFloat(document.getElementById('TYway').value) || 0;
+  const sk = parseFloat(document.getElementById('SKat').value) || 0, sp = parseFloat(document.getElementById('SPe').value) || 0, sy = parseFloat(document.getElementById('SYway').value) || 0;
+  const netDec = Math.max(0, toDecimal(tk, tp, ty) - toDecimal(sk, sp, sy));
+  document.getElementById('netDisplay').innerText = fromDecimal(netDec);
+  document.getElementById('netSubDisplay').innerText = `(${netDec.toFixed(4)} ကျပ်)`;
+}
+
+document.getElementById('gramsInput').addEventListener('input', () => convertUnits('grams'));
+['uKyat', 'uPe', 'uYway'].forEach(id => document.getElementById(id).addEventListener('input', () => convertUnits('units')));
+
+function convertUnits(source) {
+  const factor = parseFloat(document.getElementById('standard').value);
+  let kyatDec = 0;
+  if (source === 'grams') { kyatDec = (parseFloat(document.getElementById('gramsInput').value) || 0) / factor; }
+  else { kyatDec = toDecimal(document.getElementById('uKyat').value, document.getElementById('uPe').value, document.getElementById('uYway').value); }
+  if (source === 'units' || source === 'grams') {
+    let parts = fromDecimal(kyatDec).match(/\d+(\.\d+)?/g);
+    document.getElementById('uKyat').value = parts[0]; 
+    document.getElementById('uPe').value = parts[1]; 
+    document.getElementById('uYway').value = parts[2];
+  }
+  document.getElementById('uDisplay').innerText = fromDecimal(kyatDec);
+  document.getElementById('uSubDisplay').innerText = `(${kyatDec.toFixed(4)} ကျပ်) | ${(kyatDec * factor).toFixed(3)} g`;
+  if (source !== 'grams') { document.getElementById('gramsInput').value = (kyatDec * factor).toFixed(3); }
+}
+
+function convertDiamondUnits(mode) {
+  if (mode === 'ct') { 
+    const ct = parseFloat(document.getElementById('convCt').value) || 0; 
+    document.getElementById('convGm').value = (ct * 0.2).toFixed(4); 
+  } else { 
+    const gm = parseFloat(document.getElementById('convGm').value) || 0; 
+    document.getElementById('convCt').value = (gm / 0.2).toFixed(4); 
+  }
+}
+
+function resetCalculator() { 
+  document.querySelectorAll('#price-calc-view input').forEach(i => { i.value = ""; localStorage.removeItem(i.id); }); 
+}
+function resetDiamond() { 
+  document.querySelectorAll('#diamond-calc-view input').forEach(i => { i.value = ""; localStorage.removeItem(i.id); }); updateEquivPrice(); 
+}
+function resetConverter() { 
+  document.querySelectorAll('#unit-converter-view input').forEach(i => { i.value = ""; localStorage.removeItem(i.id); }); document.getElementById('uDisplay').innerText = "၀ ကျပ် ၀ ပဲ ၀ ရွေး"; 
+}
+function resetNetWeight() { 
+  ['TKat','TPe','TYway','SKat','SPe','SYway'].forEach(id => { document.getElementById(id).value = ""; localStorage.removeItem(id); }); calculateNetWeight(); 
+}
+
+function shareAsPhoto() {
+  const captureArea = document.getElementById("capture-area");
+  const currentThemeBg = window.getComputedStyle(document.body).getPropertyValue('--bg').trim();
+  
+  html2canvas(captureArea, { backgroundColor: currentThemeBg, scale: 3, logging: false, useCORS: true }).then(canvas => {
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], 'ShweCalc.png', {type: 'image/png'});
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'Shwe Calculator Result'
+          });
+        } catch(e) {}
+      } else {
+        const link = document.createElement('a'); 
+        link.download = `ShweCalc_${Date.now()}.png`; 
+        link.href = canvas.toDataURL('image/png'); 
+        link.click();
+      }
+    }, 'image/png');
+  });
+}
+
+function shareInvoice() {
+  const captureArea = document.getElementById("invoice-view");
+  const currentThemeBg = window.getComputedStyle(document.body).getPropertyValue('--bg').trim();
+  
+  const buttons = captureArea.querySelectorAll('button');
+  buttons.forEach(btn => btn.style.display = 'none');
+  
+  html2canvas(captureArea, { backgroundColor: currentThemeBg, scale: 3, logging: false, useCORS: true }).then(canvas => {
+    buttons.forEach(btn => btn.style.display = '');
+    
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], 'ShweInvoice.png', {type: 'image/png'});
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'Shwe Calculator Invoice'
+          });
+        } catch(e) {}
+      } else {
+        const link = document.createElement('a'); 
+        link.download = `ShweInvoice_${Date.now()}.png`; 
+        link.href = canvas.toDataURL('image/png'); 
+        link.click();
+      }
+    }, 'image/png');
+  });
+}
+</script>
+</body>
+</html>
