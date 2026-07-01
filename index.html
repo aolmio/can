@@ -104,7 +104,8 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 16px 16px calc(var(--nav-h) + var(--safe-bottom) + 32px) 16px;
+    /* Increased bottom padding to guarantee bottom buttons are never obscured */
+    padding: 16px 16px calc(var(--nav-h) + var(--safe-bottom) + 48px) 16px;
   }
 
   .content-wrapper {
@@ -113,7 +114,8 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    height: 100%;
+    /* Using min-height instead of fixed height to allow dynamic scrolling without cutting off */
+    min-height: 100%; 
   }
 
   .banner-card {
@@ -137,7 +139,7 @@
     margin-top: 6px;
   }
 
-  .view { display: none; height: 100%; flex-direction: column; animation: fadeIn 0.2s ease-out; }
+  .view { display: none; flex: 1; flex-direction: column; animation: fadeIn 0.2s ease-out; }
   .view.active { display: flex; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -218,6 +220,7 @@
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 
+  /* Tab Nav Bar additions for toggling */
   .nav-bar {
     position: fixed;
     bottom: 0; left: 0; right: 0;
@@ -228,6 +231,10 @@
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--border);
     z-index: 60;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .nav-bar.nav-hidden {
+    transform: translateY(100%);
   }
 
   .nav-inner {
@@ -258,6 +265,30 @@
     transition: color 0.2s;
   }
   .nav-btn.active { color: var(--primary); }
+
+  /* Floating Toggle Button styles */
+  .nav-toggle-wrap {
+    position: fixed;
+    bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+    right: 16px;
+    z-index: 59;
+    transition: bottom 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .nav-toggle-wrap.nav-hidden-shift {
+    bottom: calc(var(--safe-bottom) + 16px);
+  }
+  .nav-toggle-btn {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: background 0.2s, transform 0.2s;
+  }
+  .nav-toggle-btn:active { transform: scale(0.92); }
 
   .history-item {
     background: var(--bg);
@@ -643,6 +674,12 @@
   </div>
 </div>
 
+<div class="nav-toggle-wrap" id="nav-toggle-wrap">
+  <button class="nav-toggle-btn" onclick="toggleNav()" id="nav-toggle-btn">
+    <i data-lucide="chevrons-down" style="width:24px;height:24px;" id="nav-toggle-icon"></i>
+  </button>
+</div>
+
 <nav class="nav-bar" id="nav-bar">
   <div class="nav-inner">
     <button onclick="showView('price-calc')" id="nav-price-calc" class="nav-btn active">
@@ -685,6 +722,7 @@ if ('serviceWorker' in navigator) {
 }
 
 let bannerVisible = true;
+let navVisible = true;
 let goldPrices = {};
 let calcHistory = JSON.parse(localStorage.getItem('calcHistory') || '[]');
 let invoiceList = JSON.parse(localStorage.getItem('invoiceList') || '[]');
@@ -705,6 +743,24 @@ function toggleBanner() {
     wrapper.classList.remove('hidden-completely');
     icon.setAttribute('data-lucide', 'eye-off');
     localStorage.setItem('bannerVisible', 'true');
+  }
+  lucide.createIcons();
+}
+
+function toggleNav() {
+  navVisible = !navVisible;
+  const bar = document.getElementById('nav-bar');
+  const wrap = document.getElementById('nav-toggle-wrap');
+  const icon = document.getElementById('nav-toggle-icon');
+  
+  if (navVisible) {
+    bar.classList.remove('nav-hidden');
+    wrap.classList.remove('nav-hidden-shift');
+    icon.setAttribute('data-lucide', 'chevrons-down');
+  } else {
+    bar.classList.add('nav-hidden');
+    wrap.classList.add('nav-hidden-shift');
+    icon.setAttribute('data-lucide', 'chevrons-up');
   }
   lucide.createIcons();
 }
