@@ -2,392 +2,493 @@
 <html lang="my" class="h-full">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" id="theme-meta" content="#f2f2f7">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Shwe Calculator Pro</title>
 <link rel="manifest" href="./manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Myanmar:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <style>
-  :root {
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --nav-h: 60px;
-  }
-  
-  body.ios-light {
-    --bg: #f2f2f7;
-    --surface: #ffffff;
-    --text: #000000;
-    --text-muted: #8e8e93;
-    --primary: #d4a000;
-    --diamond: #0ea5e9;
-    --danger: #ff3b30;
-    --border: #c6c6c8;
-    --radius: 18px;
-    --nav-bg: rgba(255, 255, 255, 0.75);
-  }
-  body.ios-dark {
-    --bg: #000000;
-    --surface: #1c1c1e;
-    --text: #ffffff;
-    --text-muted: #ebebf5;
-    --primary: #f5c518;
-    --diamond: #38bdf8;
-    --danger: #ff453a;
-    --border: #38383a;
-    --radius: 18px;
-    --nav-bg: rgba(28, 28, 30, 0.75);
-  }
-  body.oneui-light {
-    --bg: #f2f2f2;
-    --surface: #fafafa;
-    --text: #191919;
-    --text-muted: #7b7b7b;
-    --primary: #d4a000;
-    --diamond: #0ea5e9;
-    --danger: #f25555;
-    --border: #e0e0e0;
-    --radius: 26px;
-    --nav-bg: rgba(250, 250, 250, 0.85);
-  }
-  body.oneui-dark {
-    --bg: #0f0f0f;
-    --surface: #181818;
-    --text: #f0f0f0;
-    --text-muted: #a0a0a0;
-    --primary: #f5c518;
-    --diamond: #38bdf8;
-    --danger: #ff6b6b;
-    --border: #2a2a2a;
-    --radius: 26px;
-    --nav-bg: rgba(24, 24, 24, 0.85);
-  }
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --nav-h: 62px;
+  --rail-w: 84px;
+  --kb-offset: 0px;
+  --content-max: 760px;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; }
-  body {
-    font-family: 'Inter', 'Pyidaungsu', sans-serif;
-    -webkit-tap-highlight-color: transparent;
-    background: var(--bg);
-    color: var(--text);
-    transition: background 0.3s, color 0.3s;
-    display: flex;
-    flex-direction: column;
-  }
+body.ios-light {
+  --bg: #f2f2f2;
+  --surface: #ffffff;
+  --surface-2: #f7f7f8;
+  --text: #14141a;
+  --text-muted: #7c7c85;
+  --primary: #b8860f;
+  --primary-soft: #f4e6c2;
+  --diamond: #0a84c7;
+  --diamond-soft: #dcf1fb;
+  --danger: #e0342c;
+  --success: #1f9c56;
+  --border: #e2e2e6;
+  --radius: 20px;
+  --nav-bg: rgba(255, 255, 255, 0.82);
+  --shadow: 0 8px 24px rgba(20,20,26,0.06);
+}
+body.ios-dark {
+  --bg: #0b0b0d;
+  --surface: #17171a;
+  --surface-2: #1f1f23;
+  --text: #f5f5f7;
+  --text-muted: #9b9ba3;
+  --primary: #e8bd4f;
+  --primary-soft: #3a3016;
+  --diamond: #4cc2f7;
+  --diamond-soft: #14313c;
+  --danger: #ff5c53;
+  --success: #35d07f;
+  --border: #2a2a2f;
+  --radius: 20px;
+  --nav-bg: rgba(23, 23, 26, 0.82);
+  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+body.oneui-light {
+  --bg: #eef0f2;
+  --surface: #ffffff;
+  --surface-2: #f5f6f8;
+  --text: #101317;
+  --text-muted: #74787f;
+  --primary: #b8860f;
+  --diamond: #0a84c7;
+  --diamond-soft: #dcf1fb;
+  --primary-soft: #f4e6c2;
+  --danger: #e0342c;
+  --success: #1f9c56;
+  --border: #dfe2e6;
+  --radius: 28px;
+  --nav-bg: rgba(255, 255, 255, 0.88);
+  --shadow: 0 10px 28px rgba(16,19,23,0.07);
+}
+body.oneui-dark {
+  --bg: #0d0f10;
+  --surface: #17191b;
+  --surface-2: #1e2123;
+  --text: #f1f2f3;
+  --text-muted: #96999d;
+  --primary: #e8bd4f;
+  --diamond: #4cc2f7;
+  --diamond-soft: #14313c;
+  --primary-soft: #3a3016;
+  --danger: #ff5c53;
+  --success: #35d07f;
+  --border: #26292b;
+  --radius: 28px;
+  --nav-bg: rgba(23, 25, 27, 0.88);
+  --shadow: 0 10px 28px rgba(0,0,0,0.4);
+}
 
-  input, select { font-size: 16px !important; font-family: inherit; }
-  input:focus, select:focus { outline: none; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Inter', 'Noto Sans Myanmar', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.25s ease, color 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  font-size: 15.5px;
+  line-height: 1.5;
+}
 
-  .header-bar {
-    padding-top: var(--safe-top);
-    background: var(--nav-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    z-index: 50;
-  }
-  
-  .header-inner {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 16px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+input, select { font-size: 16px !important; font-family: inherit; color: inherit; }
+input:focus, select:focus { outline: none; }
+button { font-family: inherit; }
 
-  .main-scroll-area {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 16px 16px calc(var(--nav-h) + var(--safe-bottom) + 48px) 16px;
-  }
+.header-bar {
+  padding-top: var(--safe-top);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  background: var(--nav-bg);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 50;
+}
 
-  .content-wrapper {
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-height: 100%; 
-  }
+.header-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 18px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  .banner-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    position: relative;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  }
-  .banner-wrapper { transition: opacity 0.3s; flex-shrink: 0; }
-  .banner-wrapper.hidden-completely { display: none; }
+.brand { display: flex; align-items: center; gap: 11px; }
+.brand-mark {
+  width: 36px; height: 36px; border-radius: 11px;
+  background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 10px rgba(184,134,15,0.28);
+  flex-shrink: 0;
+}
+.brand-title { font-weight: 800; font-size: 15px; color: var(--primary); letter-spacing: 0.03em; }
+.brand-title small { display: block; font-weight: 600; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; margin-top: 1px; }
 
-  .source-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    font-size: 12px;
-    border-top: 1px solid var(--border);
-    margin-top: 6px;
-  }
+.icon-btn {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+.icon-btn:active { transform: scale(0.9); background: var(--surface-2); }
 
-  .view { display: none; flex: 1; flex-direction: column; animation: fadeIn 0.2s ease-out; }
-  .view.active { display: flex; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.main-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px calc(var(--nav-h) + var(--safe-bottom) + 40px) 16px;
+  padding-left: calc(16px + var(--safe-left));
+  padding-right: calc(16px + var(--safe-right));
+  scroll-behavior: smooth;
+}
 
-  .responsive-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  @media (min-width: 600px) {
-    .responsive-grid { grid-template-columns: 1fr 1fr; }
-    .full-width { grid-column: 1 / -1; }
-  }
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100%;
+}
 
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-  }
+.banner-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+.banner-wrapper { transition: opacity 0.25s, max-height 0.25s; flex-shrink: 0; }
+.banner-wrapper.hidden-completely { display: none; }
 
-  .card-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  font-size: 12.5px;
+  border-top: 1px solid var(--border);
+  margin-top: 7px;
+}
 
-  .inp {
-    width: 100%;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: calc(var(--radius) * 0.75);
-    color: var(--text);
-    padding: 12px 14px;
-    font-weight: 700;
-    transition: border-color 0.2s;
-    height: 48px;
-  }
-  .inp:focus { border-color: var(--primary); }
-  .inp-center { text-align: center; }
-  
-  .inp-diamond:focus { border-color: var(--diamond); }
+.view { display: none; flex: 1; flex-direction: column; animation: fadeIn 0.22s ease-out; }
+.view.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-  .btn-primary {
-    width: 100%;
-    padding: 14px;
-    border-radius: calc(var(--radius) * 0.75);
-    border: none;
-    font-weight: 800;
-    font-size: 15px;
-    color: #000000;
-    background: var(--primary);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: transform 0.1s, filter 0.2s;
-    height: 52px;
-  }
-  .btn-primary:active { transform: scale(0.97); filter: brightness(0.9); }
+.responsive-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 560px) {
+  .responsive-grid { grid-template-columns: 1fr 1fr; }
+  .full-width { grid-column: 1 / -1; }
+}
 
-  .btn-diamond {
-    width: 100%;
-    padding: 14px;
-    border-radius: calc(var(--radius) * 0.75);
-    border: none;
-    font-weight: 800;
-    font-size: 15px;
-    color: #000000;
-    background: var(--diamond);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: transform 0.1s, filter 0.2s;
-    height: 52px;
-  }
-  .btn-diamond:active { transform: scale(0.97); filter: brightness(0.9); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
 
-  .btn-secondary {
-    width: 100%;
-    padding: 14px;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-weight: 700;
-    border-radius: calc(var(--radius) * 0.75);
-    font-size: 14px;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    cursor: pointer;
-  }
-  .btn-secondary:active { transform: scale(0.97); background: var(--bg); }
+.card-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.inp {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: calc(var(--radius) * 0.68);
+  color: var(--text);
+  padding: 12px 14px;
+  font-weight: 700;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  height: 50px;
+}
+.inp:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.inp-center { text-align: center; }
+.inp-diamond:focus { border-color: var(--diamond); box-shadow: 0 0 0 3px var(--diamond-soft); }
 
+.btn-primary, .btn-diamond, .btn-secondary, .btn-ghost {
+  width: 100%;
+  padding: 14px;
+  border-radius: calc(var(--radius) * 0.68);
+  border: none;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform 0.1s, filter 0.2s, background 0.15s;
+  height: 52px;
+}
+.btn-primary { color: #14110a; background: var(--primary); }
+.btn-primary:active { transform: scale(0.97); filter: brightness(0.92); }
+.btn-diamond { color: #071a24; background: var(--diamond); }
+.btn-diamond:active { transform: scale(0.97); filter: brightness(0.92); }
+.btn-success { color: #fff; background: var(--success); }
+.btn-success:active { transform: scale(0.97); filter: brightness(0.92); }
+.btn-secondary {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+}
+.btn-secondary:active { transform: scale(0.97); background: var(--surface-2); }
+.btn-ghost {
+  background: transparent;
+  border: 1.5px dashed var(--border);
+  color: var(--text-muted);
+}
+.btn-ghost:active { transform: scale(0.97); background: var(--surface-2); }
+.btn-row { display: flex; gap: 10px; }
+.btn-row > * { flex: 1; }
+
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+.nav-bar {
+  position: fixed;
+  bottom: var(--kb-offset, 0px); left: 0; right: 0;
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  background: var(--nav-bg);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-top: 1px solid var(--border);
+  z-index: 60;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), bottom 0.15s ease-out;
+}
+.nav-bar.nav-hidden, .nav-bar.kb-hidden { transform: translateY(100%); }
+
+.nav-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  display: flex;
+  height: var(--nav-h);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+
+.nav-btn {
+  flex: 1;
+  min-width: 66px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-btn.active { color: var(--primary); }
+.nav-btn.active-diamond { color: var(--diamond); }
+
+.nav-toggle-wrap {
+  position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px + var(--kb-offset, 0px));
+  right: calc(16px + var(--safe-right));
+  z-index: 59;
+  transition: bottom 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s;
+}
+.nav-toggle-wrap.nav-hidden-shift { bottom: calc(var(--safe-bottom) + 16px); }
+.nav-toggle-wrap.kb-hidden { opacity: 0; pointer-events: none; }
+.nav-toggle-btn {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.2s, transform 0.2s;
+}
+.nav-toggle-btn:active { transform: scale(0.92); }
+
+.history-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+.history-item:last-child { margin-bottom: 0; }
+
+.result-box {
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 22px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.result-box-diamond { border-color: var(--diamond); }
+.result-val { font-size: 27px; font-weight: 900; color: var(--primary); letter-spacing: -0.01em; }
+.result-val-diamond { color: var(--diamond); }
+
+.tab-bar {
+  display: flex;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.68);
+  padding: 4px;
+  margin-bottom: 16px;
+}
+.tab-btn {
+  flex: 1; padding: 11px; border-radius: calc(var(--radius) * 0.55); border: none;
+  font-weight: 700; font-size: 13px; color: var(--text-muted); background: transparent;
+  cursor: pointer; transition: 0.2s;
+}
+.tab-btn.active { background: var(--surface); color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+.badge {
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 10px;
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.info-note {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.info-note p { font-size: 13px; line-height: 1.65; font-weight: 500; color: var(--text); }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 20px);
+  transform: translate(-50%, 12px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13.5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 200;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+body.keyboard-open .main-scroll-area { padding-bottom: 32px; }
+
+@media (min-width: 900px) {
+  .header-bar, .main-scroll-area { margin-left: var(--rail-w); }
+  .nav-toggle-wrap { display: none; }
   .nav-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: calc(var(--nav-h) + var(--safe-bottom));
-    padding-bottom: var(--safe-bottom);
-    background: var(--nav-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border);
-    z-index: 60;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    top: 0; bottom: 0; left: 0; right: auto;
+    width: var(--rail-w);
+    height: 100vh;
+    padding-top: calc(var(--safe-top) + 14px);
+    padding-bottom: calc(var(--safe-bottom) + 14px);
+    padding-left: var(--safe-left);
+    border-top: none;
+    border-right: 1px solid var(--border);
   }
-  .nav-bar.nav-hidden {
-    transform: translateY(100%);
-  }
-
+  .nav-bar.kb-hidden { transform: none; }
   .nav-inner {
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    height: var(--nav-h);
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .nav-inner::-webkit-scrollbar { display: none; }
-  
-  .nav-btn {
-    flex: 1;
-    min-width: 65px;
-    display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-weight: 700;
-    font-size: 10px;
-    cursor: pointer;
-    transition: color 0.2s;
+    height: auto;
+    overflow: visible;
+    gap: 6px;
+    padding: 0 10px;
   }
-  .nav-btn.active { color: var(--primary); }
-  .nav-btn.active-diamond { color: var(--diamond); }
+  .nav-btn { flex: none; width: 100%; padding: 13px 0; border-radius: 14px; }
+  .nav-btn.active, .nav-btn.active-diamond { background: var(--surface-2); }
+  .main-scroll-area { padding-bottom: 48px; }
+  .content-wrapper { max-width: 880px; }
+  body { font-size: 16px; }
+}
 
-  .nav-toggle-wrap {
-    position: fixed;
-    bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
-    right: 16px;
-    z-index: 59;
-    transition: bottom 0.3s cubic-bezier(0.4,0,0.2,1);
-  }
-  .nav-toggle-wrap.nav-hidden-shift {
-    bottom: calc(var(--safe-bottom) + 16px);
-  }
-  .nav-toggle-btn {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: background 0.2s, transform 0.2s;
-  }
-  .nav-toggle-btn:active { transform: scale(0.92); }
-
-  .history-item {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px;
-    margin-bottom: 10px;
-    text-align: left;
-  }
-  .history-item:last-child { margin-bottom: 0; }
-
-  .result-box {
-    background: var(--surface);
-    border: 2px solid var(--primary);
-    border-radius: var(--radius);
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  }
-  .result-box-diamond {
-    border-color: var(--diamond);
-  }
-  
-  .result-val { font-size: 26px; font-weight: 900; color: var(--primary); }
-  .result-val-diamond { color: var(--diamond); }
-
-  .tab-bar {
-    display: flex;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) * 0.75);
-    padding: 4px;
-    margin-bottom: 16px;
-  }
-  .tab-btn {
-    flex: 1; padding: 10px; border-radius: calc(var(--radius) * 0.6); border: none; font-weight: 700; font-size: 13px; color: var(--text-muted); background: transparent; cursor: pointer; transition: 0.2s;
-  }
-  .tab-btn.active { background: var(--surface); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-  select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 36px;
-  }
-  
-  .badge {
-    background: var(--danger);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 900;
-    padding: 2px 6px;
-    border-radius: 10px;
-    position: absolute;
-    top: 4px;
-    right: 4px;
-  }
+@media (min-width: 1200px) {
+  .content-wrapper { max-width: 980px; }
+  .responsive-grid { grid-template-columns: repeat(3, 1fr); }
+  .responsive-grid .full-width { grid-column: 1 / -1; }
+}
 </style>
 </head>
 <body class="ios-dark">
 
 <header class="header-bar">
   <div class="header-inner">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:34px;height:34px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;" id="header-icon-bg">
-        <i data-lucide="calculator" style="width:18px;height:18px;color:#000;" id="header-icon"></i>
+    <div class="brand">
+      <div class="brand-mark" id="header-icon-bg">
+        <i data-lucide="calculator" style="width:19px;height:19px;color:#14110a;" id="header-icon"></i>
       </div>
-      <div id="nav-title" style="font-weight:900;font-size:15px;color:var(--primary);letter-spacing:0.02em;">SHWE CALC</div>
+      <div class="brand-title" id="nav-title-wrap">SHWE CALC<small id="nav-subtitle">ရွှေဈေးတွက်စက်</small></div>
     </div>
-    <div style="display:flex;align-items:center;gap:16px;">
-      <button onclick="toggleBanner()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;" id="toggle-banner-btn">
-        <i data-lucide="eye-off" style="width:20px;height:20px;"></i>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <button onclick="toggleBanner()" class="icon-btn" id="toggle-banner-btn" aria-label="Toggle price banner">
+        <i data-lucide="eye-off" style="width:19px;height:19px;"></i>
       </button>
-      <button onclick="manualRefreshAll()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;" id="refresh-btn">
-        <i data-lucide="refresh-cw" style="width:20px;height:20px;"></i>
+      <button onclick="manualRefreshAll()" class="icon-btn" id="refresh-btn" aria-label="Refresh gold price">
+        <i data-lucide="refresh-cw" style="width:19px;height:19px;"></i>
       </button>
-      <button onclick="cycleTheme()" style="background:none;border:none;color:var(--text);cursor:pointer;" id="theme-btn">
-        <i data-lucide="palette" style="width:20px;height:20px;" id="theme-icon"></i>
+      <button onclick="cycleTheme()" class="icon-btn" id="theme-btn" aria-label="Change theme" style="color:var(--text);">
+        <i data-lucide="palette" style="width:19px;height:19px;" id="theme-icon"></i>
       </button>
     </div>
   </div>
@@ -398,22 +499,22 @@
 
     <div id="banner-wrapper" class="banner-wrapper">
       <div class="banner-card">
-        <button onclick="toggleBanner()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text-muted);cursor:pointer;">
-          <i data-lucide="x" style="width:16px;height:16px;"></i>
+        <button onclick="toggleBanner()" class="icon-btn" style="position:absolute;top:10px;right:10px;width:30px;height:30px;">
+          <i data-lucide="x" style="width:15px;height:15px;"></i>
         </button>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">
           <i data-lucide="trending-up" style="width:16px;height:16px;color:var(--primary);"></i>
-          <span style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;">XAU/USD Live</span>
+          <span style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">XAU/USD Live</span>
         </div>
-        <div id="main-price-display" style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em;">Loading...</div>
-        
+        <div id="main-price-display" style="font-size:25px;font-weight:900;color:var(--text);margin-bottom:9px;letter-spacing:-0.02em;">Loading...</div>
+
         <div class="source-row">
-          <span style="background:var(--bg);color:var(--text);padding:4px 8px;border-radius:6px;font-weight:800;border:1px solid var(--border);">PAXG</span>
+          <span style="background:var(--surface-2);color:var(--text);padding:4px 9px;border-radius:7px;font-weight:800;border:1px solid var(--border);font-size:11px;">PAXG</span>
           <span style="flex:1;font-weight:600;color:var(--text-muted);">Binance</span>
           <span id="price-binance" style="font-weight:800;color:var(--text);">—</span>
         </div>
         <div class="source-row">
-          <span style="background:var(--bg);color:var(--text);padding:4px 8px;border-radius:6px;font-weight:800;border:1px solid var(--border);">XAUT</span>
+          <span style="background:var(--surface-2);color:var(--text);padding:4px 9px;border-radius:7px;font-weight:800;border:1px solid var(--border);font-size:11px;">XAUT</span>
           <span style="flex:1;font-weight:600;color:var(--text-muted);">CoinGecko</span>
           <span id="price-coingecko" style="font-weight:800;color:var(--text);">—</span>
         </div>
@@ -423,12 +524,12 @@
     <div id="price-calc-view" class="view active">
       <div class="responsive-grid">
         <div class="card full-width">
-          <div class="card-label"><i data-lucide="circle-dollar-sign" style="width:16px;height:16px;"></i> ယနေ့ပေါက်ဈေး (ကျပ်)</div>
-          <input type="number" id="GoldPrice" inputmode="numeric" pattern="[0-9]*" placeholder="0" class="inp" style="font-size:22px !important;font-weight:800;text-align:center;height:56px;">
+          <div class="card-label"><i data-lucide="circle-dollar-sign" style="width:15px;height:15px;"></i> ယနေ့ပေါက်ဈေး (ကျပ်)</div>
+          <input type="number" id="GoldPrice" inputmode="numeric" pattern="[0-9]*" placeholder="0" class="inp" style="font-size:22px !important;font-weight:800;text-align:center;height:58px;">
         </div>
 
         <div class="card">
-          <div class="card-label"><i data-lucide="scale" style="width:16px;height:16px;"></i> ရွှေအလေးချိန်</div>
+          <div class="card-label"><i data-lucide="scale" style="width:15px;height:15px;"></i> ရွှေအလေးချိန်</div>
           <div class="grid-3">
             <input type="number" id="PKat" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
             <input type="number" id="PPe" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
@@ -437,7 +538,7 @@
         </div>
 
         <div class="card">
-          <div class="card-label" style="color:var(--danger);"><i data-lucide="trending-down" style="width:16px;height:16px;"></i> အလျော့တွက်</div>
+          <div class="card-label" style="color:var(--danger);"><i data-lucide="trending-down" style="width:15px;height:15px;"></i> အလျော့တွက်</div>
           <div class="grid-3">
             <input type="number" id="RKat" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
             <input type="number" id="RPae" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
@@ -471,15 +572,20 @@
       <div id="capture-area" style="background:var(--bg);padding-bottom:12px;border-radius:var(--radius);">
         <div class="result-box" id="res-list"></div>
       </div>
-      
+
       <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px;">
-        <button onclick="addCurrentToInvoice()" class="btn-secondary" style="color:var(--text);border-color:var(--border);">
+        <button onclick="addCurrentToInvoice()" class="btn-secondary">
           <i data-lucide="plus-square" style="width:20px;height:20px;"></i> ဘောင်ချာသို့ ထည့်မည်
         </button>
-        <button onclick="shareAsPhoto()" class="btn-primary" style="background:#34c759;color:#fff;">
-          <i data-lucide="share" style="width:20px;height:20px;"></i> မျှဝေမည် (Share)
-        </button>
-        <button onclick="showView('price-calc')" class="btn-secondary">နောက်သို့ ပြန်သွားမည်</button>
+        <div class="btn-row">
+          <button onclick="saveAsPhoto()" class="btn-secondary">
+            <i data-lucide="download" style="width:19px;height:19px;"></i> Save
+          </button>
+          <button onclick="shareAsPhoto()" class="btn-success">
+            <i data-lucide="share" style="width:19px;height:19px;"></i> Share
+          </button>
+        </div>
+        <button onclick="showView('price-calc')" class="btn-ghost">နောက်သို့ ပြန်သွားမည်</button>
       </div>
     </div>
 
@@ -489,11 +595,11 @@
         <button id="tab-yield" class="tab-btn" onclick="switchPurityTab('yield')">အသားတင်ထွက်နှုန်း</button>
       </div>
 
-      <div class="card" style="margin-bottom:12px;background:var(--bg);">
-        <div style="display:flex;align-items:center;gap:6px;color:var(--primary);font-weight:800;font-size:12px;margin-bottom:8px;">
-          <i data-lucide="info" style="width:16px;height:16px;"></i> Density အညွှန်းကိန်းများ
+      <div class="info-note" style="margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:6px;color:var(--primary);font-weight:800;font-size:12px;margin-bottom:6px;">
+          <i data-lucide="info" style="width:15px;height:15px;"></i> Density အညွှန်းကိန်းများ
         </div>
-        <p style="font-size:13px;line-height:1.6;font-weight:600;color:var(--text);">၁၆ပဲရည် ရွှေတစ်ကျပ်သားတွင် <b style="color:var(--primary)">19.25</b> Density ရှိပြီး ၁၅ပဲရည်သည် <b style="color:var(--primary)">17.8</b> Density ဖြစ်ပါသည်။</p>
+        <p>၁၆ပဲရည် ရွှေတစ်ကျပ်သားတွင် <b style="color:var(--primary)">19.25</b> Density ရှိပြီး ၁၅ပဲရည်သည် <b style="color:var(--primary)">17.8</b> Density ဖြစ်ပါသည်။</p>
       </div>
 
       <div id="purity-sub-view" class="responsive-grid">
@@ -627,7 +733,7 @@
         <div id="uDisplay" class="result-val">၀ ကျပ် ၀ ပဲ ၀ ရွေး</div>
         <div id="uSubDisplay" style="font-size:13px;margin-top:8px;color:var(--text-muted);font-weight:600;">(0.0000 ကျပ်) | 0.000 g</div>
       </div>
-      
+
       <div style="margin-top:auto;padding-top:16px;">
         <button onclick="resetConverter()" class="btn-secondary">RESET</button>
       </div>
@@ -636,7 +742,7 @@
     <div id="net-weight-view" class="view">
       <div class="responsive-grid">
         <div class="card full-width">
-          <div class="card-label" style="color:#34c759;"><i data-lucide="plus-circle" style="width:16px;height:16px;"></i> စုစုပေါင်းအလေးချိန်</div>
+          <div class="card-label" style="color:var(--success);"><i data-lucide="plus-circle" style="width:15px;height:15px;"></i> စုစုပေါင်းအလေးချိန်</div>
           <div class="grid-3">
             <input type="number" id="TKat" oninput="calculateNetWeight()" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
             <input type="number" id="TPe" oninput="calculateNetWeight()" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
@@ -645,7 +751,7 @@
         </div>
 
         <div class="card full-width">
-          <div class="card-label" style="color:var(--danger);"><i data-lucide="minus-circle" style="width:16px;height:16px;"></i> နှုတ်မည့်အလေးချိန်</div>
+          <div class="card-label" style="color:var(--danger);"><i data-lucide="minus-circle" style="width:15px;height:15px;"></i> နှုတ်မည့်အလေးချိန်</div>
           <div class="grid-3">
             <input type="number" id="SKat" oninput="calculateNetWeight()" inputmode="numeric" pattern="[0-9]*" placeholder="ကျပ်" class="inp inp-center">
             <input type="number" id="SPe" oninput="calculateNetWeight()" inputmode="numeric" pattern="[0-9]*" placeholder="ပဲ" class="inp inp-center">
@@ -666,13 +772,13 @@
     </div>
 
     <div id="invoice-view" class="view">
-      <div class="card" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;background:var(--primary);color:#000;">
+      <div class="card" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;background:var(--primary);color:#14110a;">
         <div style="font-weight:800;font-size:16px;">စုစုပေါင်း ကျသင့်ငွေ</div>
         <div id="invoice-total" style="font-size:22px;font-weight:900;">၀ ကျပ်</div>
       </div>
-      
+
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div class="card-label" style="margin:0;"><i data-lucide="list" style="width:16px;height:16px;"></i> ဘောင်ချာစာရင်း</div>
+        <div class="card-label" style="margin:0;"><i data-lucide="list" style="width:15px;height:15px;"></i> ဘောင်ချာစာရင်း</div>
         <button onclick="clearInvoice()" style="background:none;border:none;color:var(--danger);font-weight:700;font-size:12px;cursor:pointer;">Clear All</button>
       </div>
 
@@ -681,15 +787,20 @@
       </div>
 
       <div style="margin-top:auto;padding-top:16px;display:flex;flex-direction:column;gap:12px;">
-        <button onclick="shareInvoice()" class="btn-primary" style="background:#34c759;color:#fff;">
-          <i data-lucide="share" style="width:20px;height:20px;"></i> ဘောင်ချာ မျှဝေမည် (Share)
-        </button>
+        <div class="btn-row">
+          <button onclick="saveInvoice()" class="btn-secondary">
+            <i data-lucide="download" style="width:19px;height:19px;"></i> Save
+          </button>
+          <button onclick="shareInvoice()" class="btn-success">
+            <i data-lucide="share" style="width:19px;height:19px;"></i> Share
+          </button>
+        </div>
       </div>
     </div>
 
     <div id="history-view" class="view">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <div class="card-label" style="margin:0;"><i data-lucide="history" style="width:16px;height:16px;"></i> မှတ်တမ်းများ</div>
+        <div class="card-label" style="margin:0;"><i data-lucide="history" style="width:15px;height:15px;"></i> မှတ်တမ်းများ</div>
         <button onclick="clearAllHistory()" style="background:none;border:none;color:var(--danger);font-weight:700;font-size:12px;cursor:pointer;">Clear All</button>
       </div>
       <div id="history-list" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -700,43 +811,45 @@
 
 <div class="nav-toggle-wrap" id="nav-toggle-wrap">
   <button class="nav-toggle-btn" onclick="toggleNav()" id="nav-toggle-btn">
-    <i data-lucide="chevrons-down" style="width:24px;height:24px;" id="nav-toggle-icon"></i>
+    <i data-lucide="chevrons-down" style="width:22px;height:22px;" id="nav-toggle-icon"></i>
   </button>
 </div>
 
 <nav class="nav-bar" id="nav-bar">
   <div class="nav-inner">
     <button onclick="showView('price-calc')" id="nav-price-calc" class="nav-btn active">
-      <i data-lucide="coins" style="width:22px;height:22px;"></i>
+      <i data-lucide="coins" style="width:21px;height:21px;"></i>
       <span>ရွှေဈေး</span>
     </button>
     <button onclick="showView('purity-calc')" id="nav-purity-calc" class="nav-btn">
-      <i data-lucide="flask-conical" style="width:22px;height:22px;"></i>
+      <i data-lucide="flask-conical" style="width:21px;height:21px;"></i>
       <span>အခေါက်</span>
     </button>
     <button onclick="showView('diamond-calc')" id="nav-diamond-calc" class="nav-btn">
-      <i data-lucide="gem" style="width:22px;height:22px;"></i>
+      <i data-lucide="gem" style="width:21px;height:21px;"></i>
       <span>စိန်/ရတနာ</span>
     </button>
     <button onclick="showView('unit-converter')" id="nav-unit-converter" class="nav-btn">
-      <i data-lucide="refresh-cw" style="width:22px;height:22px;"></i>
+      <i data-lucide="refresh-cw" style="width:21px;height:21px;"></i>
       <span>ယူနစ်</span>
     </button>
     <button onclick="showView('net-weight')" id="nav-net-weight" class="nav-btn">
-      <i data-lucide="layers" style="width:22px;height:22px;"></i>
+      <i data-lucide="layers" style="width:21px;height:21px;"></i>
       <span>အသားတင်</span>
     </button>
     <button onclick="showView('invoice')" id="nav-invoice" class="nav-btn" style="position:relative;">
-      <i data-lucide="file-text" style="width:22px;height:22px;"></i>
+      <i data-lucide="file-text" style="width:21px;height:21px;"></i>
       <span>ဘောင်ချာ</span>
       <span id="invoice-badge" class="badge" style="display:none;">0</span>
     </button>
     <button onclick="showView('history')" id="nav-history" class="nav-btn">
-      <i data-lucide="history" style="width:22px;height:22px;"></i>
+      <i data-lucide="history" style="width:21px;height:21px;"></i>
       <span>မှတ်တမ်း</span>
     </button>
   </div>
 </nav>
+
+<div class="toast" id="toast"></div>
 
 <script>
 if ('serviceWorker' in navigator) {
@@ -751,9 +864,18 @@ let goldPrices = {};
 let calcHistory = JSON.parse(localStorage.getItem('calcHistory') || '[]');
 let invoiceList = JSON.parse(localStorage.getItem('invoiceList') || '[]');
 let currentCalcData = null;
+let toastTimer = null;
 
 const themes = ['ios-light', 'ios-dark', 'oneui-light', 'oneui-dark'];
 let currentThemeIndex = 0;
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
 
 function toggleBanner() {
   const wrapper = document.getElementById('banner-wrapper');
@@ -776,7 +898,7 @@ function toggleNav() {
   const bar = document.getElementById('nav-bar');
   const wrap = document.getElementById('nav-toggle-wrap');
   const icon = document.getElementById('nav-toggle-icon');
-  
+
   if (navVisible) {
     bar.classList.remove('nav-hidden');
     wrap.classList.remove('nav-hidden-shift');
@@ -861,10 +983,43 @@ function manualRefreshAll() {
 
 const allInputs = document.querySelectorAll('input, select');
 allInputs.forEach(input => {
-  input.addEventListener('input', () => { 
-    if (input.id) localStorage.setItem(input.id, input.value); 
+  input.addEventListener('input', () => {
+    if (input.id) localStorage.setItem(input.id, input.value);
   });
 });
+
+function initViewportHandling() {
+  const root = document.documentElement;
+  const nav = document.getElementById('nav-bar');
+  const toggleWrap = document.getElementById('nav-toggle-wrap');
+  const scrollArea = document.querySelector('.main-scroll-area');
+
+  function apply() {
+    if (!window.visualViewport) return;
+    const vv = window.visualViewport;
+    const offsetBottom = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
+    const isDesktopRail = window.innerWidth >= 900;
+    const keyboardOpen = !isDesktopRail && offsetBottom > 120;
+    document.body.classList.toggle('keyboard-open', keyboardOpen);
+    nav.classList.toggle('kb-hidden', keyboardOpen);
+    toggleWrap.classList.toggle('kb-hidden', keyboardOpen);
+    root.style.setProperty('--kb-offset', keyboardOpen ? '0px' : '0px');
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', apply);
+    window.visualViewport.addEventListener('scroll', apply);
+  }
+  apply();
+
+  document.addEventListener('focusin', (e) => {
+    if (e.target.matches('input, select')) {
+      setTimeout(() => {
+        e.target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }, 260);
+    }
+  });
+}
 
 window.onload = () => {
   const savedIndex = localStorage.getItem('appThemeIndex');
@@ -891,6 +1046,7 @@ window.onload = () => {
   fetchGoldPrice();
   renderHistory();
   renderInvoice();
+  initViewportHandling();
   setInterval(fetchGoldPrice, 300000);
   lucide.createIcons();
 };
@@ -899,6 +1055,7 @@ function showView(view) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   const target = document.getElementById(view + '-view');
   if (target) target.classList.add('active');
+  document.querySelector('.main-scroll-area').scrollTop = 0;
 
   const navIds = ['price-calc', 'purity-calc', 'diamond-calc', 'unit-converter', 'net-weight', 'invoice', 'history'];
   navIds.forEach(id => {
@@ -907,19 +1064,20 @@ function showView(view) {
   });
 
   const currentNav = document.getElementById('nav-' + view);
-  const titleEl = document.getElementById('nav-title');
+  const titleEl = document.getElementById('nav-title-wrap');
+  const subtitleEl = document.getElementById('nav-subtitle');
   const iconBg = document.getElementById('header-icon-bg');
   const navToggleBtn = document.getElementById('nav-toggle-btn');
-  
+
   if (view === 'diamond-calc') {
-    titleEl.textContent = 'DIAMOND CALC';
     titleEl.style.color = 'var(--diamond)';
+    subtitleEl.textContent = 'စိန်/ရတနာ တွက်စက်';
     iconBg.style.background = 'var(--diamond)';
     navToggleBtn.style.color = 'var(--diamond)';
     if (currentNav) currentNav.classList.add('active-diamond');
   } else {
-    titleEl.textContent = 'SHWE CALC';
     titleEl.style.color = 'var(--primary)';
+    subtitleEl.textContent = 'ရွှေဈေးတွက်စက်';
     iconBg.style.background = 'var(--primary)';
     navToggleBtn.style.color = 'var(--primary)';
     if (currentNav) currentNav.classList.add('active');
@@ -931,23 +1089,23 @@ function switchPurityTab(type) {
   const tabYield = document.getElementById('tab-yield');
   const pSub = document.getElementById('purity-sub-view');
   const ySub = document.getElementById('yield-sub-view');
-  
+
   if (type === 'purity') {
-    tabPurity.classList.add('active'); 
+    tabPurity.classList.add('active');
     tabYield.classList.remove('active');
-    pSub.style.display = 'grid'; 
+    pSub.style.display = 'grid';
     ySub.style.display = 'none';
   } else {
-    tabYield.classList.add('active'); 
+    tabYield.classList.add('active');
     tabPurity.classList.remove('active');
-    ySub.style.display = 'grid'; 
+    ySub.style.display = 'grid';
     pSub.style.display = 'none';
   }
   document.getElementById('purity-result').style.display = 'none';
 }
 
-function toDecimal(k, p, y) { 
-  return (parseFloat(k)||0) + ((parseFloat(p)||0)/16) + ((parseFloat(y)||0)/128); 
+function toDecimal(k, p, y) {
+  return (parseFloat(k)||0) + ((parseFloat(p)||0)/16) + ((parseFloat(y)||0)/128);
 }
 
 function fromDecimal(decimal) {
@@ -1022,14 +1180,14 @@ function calculateDiamondPrice() {
   const r = parseFloat(document.getElementById('DR').value) || 0, b = parseFloat(document.getElementById('DB').value) || 0, p = parseFloat(document.getElementById('DP').value) || 0;
   const totalRatti = r + (b / 20) + (p / 160);
   let total = (type === 'carat') ? (ct * price) : (totalRatti * price);
-  
+
   let html = `
     <div style="font-size:14px;color:var(--text-muted);margin-bottom:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">စိန်/ရတနာ တွက်ချက်မှု</div>
     <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:8px;"><span>သတ်မှတ်ဈေး:</span><span style="color:var(--text);font-weight:800;">${price.toLocaleString()}</span></div>
     <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:16px;"><span>အလေးချိန်:</span><span style="font-weight:700;">${ct} Ct (${r}R ${b}B ${p}P)</span></div>
     <div style="font-size:26px;font-weight:900;color:var(--diamond);border-top:1px solid var(--border);padding-top:16px;">${Math.round(total).toLocaleString()} ကျပ်</div>
   `;
-  
+
   document.getElementById('res-list').innerHTML = html;
   document.getElementById('res-list').classList.add('result-box-diamond');
   currentCalcData = { amount: total, summary: `စိန်/ရတနာ (${ct} Ct)` };
@@ -1045,7 +1203,7 @@ function calculatePrice() {
   const goldKyat = toDecimal(pk, pp, py), redKyat = toDecimal(rk, rp, ry);
   const smith = getVal('Smith'), stone = getVal('StonePrice');
   const total = (goldKyat * price) + (redKyat * price) + smith + stone;
-  
+
   let html = `
     <div style="font-size:14px;color:var(--text-muted);margin-bottom:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">ရွှေတွက်ချက်မှု</div>
     <div style="display:flex;justify-content:space-between;font-size:15px;margin-bottom:8px;">
@@ -1070,7 +1228,7 @@ function calculatePrice() {
       ${Math.round(total).toLocaleString()} ကျပ်
     </div>
   `;
-  
+
   document.getElementById('res-list').innerHTML = html;
   document.getElementById('res-list').classList.remove('result-box-diamond');
   currentCalcData = { amount: total, summary: `ရွှေ (${pk}K ${pp}P ${py}Y)` };
@@ -1100,7 +1258,7 @@ function renderHistory() {
   list.innerHTML = calcHistory.map((item, idx) => `
     <div class="history-item" style="display:flex;align-items:flex-start;gap:12px;position:relative;">
       <div style="flex:1;">${item.html}</div>
-      <button onclick="deleteHistoryItem(${idx})" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+      <button onclick="deleteHistoryItem(${idx})" style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px;color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;">
         <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
       </button>
     </div>
@@ -1129,19 +1287,20 @@ function addCurrentToInvoice() {
   });
   localStorage.setItem('invoiceList', JSON.stringify(invoiceList));
   renderInvoice();
-  
+
   const badge = document.getElementById('invoice-badge');
   badge.style.display = 'block';
   badge.style.animation = 'none';
-  badge.offsetHeight; 
+  badge.offsetHeight;
   badge.style.animation = 'fadeIn 0.3s ease-out';
+  showToast('ဘောင်ချာသို့ ထည့်ပြီးပါပြီ');
 }
 
 function renderInvoice() {
   const list = document.getElementById('invoice-list');
   const totalEl = document.getElementById('invoice-total');
   const badge = document.getElementById('invoice-badge');
-  
+
   if(invoiceList.length > 0) {
     badge.innerText = invoiceList.length;
     badge.style.display = 'block';
@@ -1163,7 +1322,7 @@ function renderInvoice() {
         <div style="font-weight:700;font-size:14px;color:var(--text-muted);">${item.title}</div>
         <div style="font-weight:800;color:var(--text);font-size:16px;margin-top:6px;">${Math.round(item.amount).toLocaleString()} ကျပ်</div>
       </div>
-      <button onclick="deleteInvoiceItem(${idx})" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+      <button onclick="deleteInvoiceItem(${idx})" style="background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:8px;color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;">
         <i data-lucide="minus-circle" style="width:18px;height:18px;"></i>
       </button>
     </div>
@@ -1203,8 +1362,8 @@ function convertUnits(source) {
   else { kyatDec = toDecimal(document.getElementById('uKyat').value, document.getElementById('uPe').value, document.getElementById('uYway').value); }
   if (source === 'units' || source === 'grams') {
     let parts = fromDecimal(kyatDec).match(/\d+(\.\d+)?/g);
-    document.getElementById('uKyat').value = parts[0]; 
-    document.getElementById('uPe').value = parts[1]; 
+    document.getElementById('uKyat').value = parts[0];
+    document.getElementById('uPe').value = parts[1];
     document.getElementById('uYway').value = parts[2];
   }
   document.getElementById('uDisplay').innerText = fromDecimal(kyatDec);
@@ -1213,79 +1372,98 @@ function convertUnits(source) {
 }
 
 function convertDiamondUnits(mode) {
-  if (mode === 'ct') { 
-    const ct = parseFloat(document.getElementById('convCt').value) || 0; 
-    document.getElementById('convGm').value = (ct * 0.2).toFixed(4); 
-  } else { 
-    const gm = parseFloat(document.getElementById('convGm').value) || 0; 
-    document.getElementById('convCt').value = (gm / 0.2).toFixed(4); 
+  if (mode === 'ct') {
+    const ct = parseFloat(document.getElementById('convCt').value) || 0;
+    document.getElementById('convGm').value = (ct * 0.2).toFixed(4);
+  } else {
+    const gm = parseFloat(document.getElementById('convGm').value) || 0;
+    document.getElementById('convCt').value = (gm / 0.2).toFixed(4);
   }
 }
 
-function resetCalculator() { 
-  document.querySelectorAll('#price-calc-view input').forEach(i => { i.value = ""; localStorage.removeItem(i.id); }); 
+function resetCalculator() {
+  document.querySelectorAll('#price-calc-view input').forEach(i => { i.value = ""; localStorage.removeItem(i.id); });
 }
-function resetDiamond() { 
-  document.querySelectorAll('#diamond-calc-view input').forEach(i => { i.value = ""; localStorage.removeItem(i.id); }); updateEquivPrice(); 
+function resetDiamond() {
+  document.querySelectorAll('#diamond-calc-view input').forEach(i => { i.value = ""; localStorage.removeItem(i.id); }); updateEquivPrice();
 }
-function resetConverter() { 
-  document.querySelectorAll('#unit-converter-view input').forEach(i => { i.value = ""; localStorage.removeItem(i.id); }); document.getElementById('uDisplay').innerText = "၀ ကျပ် ၀ ပဲ ၀ ရွေး"; 
+function resetConverter() {
+  document.querySelectorAll('#unit-converter-view input').forEach(i => { i.value = ""; localStorage.removeItem(i.id); }); document.getElementById('uDisplay').innerText = "၀ ကျပ် ၀ ပဲ ၀ ရွေး";
 }
-function resetNetWeight() { 
-  ['TKat','TPe','TYway','SKat','SPe','SYway'].forEach(id => { document.getElementById(id).value = ""; localStorage.removeItem(id); }); calculateNetWeight(); 
+function resetNetWeight() {
+  ['TKat','TPe','TYway','SKat','SPe','SYway'].forEach(id => { document.getElementById(id).value = ""; localStorage.removeItem(id); }); calculateNetWeight();
 }
 
-function shareAsPhoto() {
-  const captureArea = document.getElementById("capture-area");
+function captureElement(id, hideButtons) {
+  const area = document.getElementById(id);
+  let buttons = [];
+  if (hideButtons) {
+    buttons = Array.from(area.querySelectorAll('button'));
+    buttons.forEach(btn => btn.style.display = 'none');
+  }
   const currentThemeBg = window.getComputedStyle(document.body).getPropertyValue('--bg').trim();
-  
-  html2canvas(captureArea, { backgroundColor: currentThemeBg, scale: 3, logging: false, useCORS: true }).then(canvas => {
-    canvas.toBlob(async (blob) => {
-      const file = new File([blob], 'ShweCalc.png', {type: 'image/png'});
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'Shwe Calculator Result'
-          });
-        } catch(e) {}
-      } else {
-        const link = document.createElement('a'); 
-        link.download = `ShweCalc_${Date.now()}.png`; 
-        link.href = canvas.toDataURL('image/png'); 
-        link.click();
-      }
-    }, 'image/png');
+  return html2canvas(area, { backgroundColor: currentThemeBg, scale: 3, logging: false, useCORS: true }).then(canvas => {
+    if (hideButtons) buttons.forEach(btn => btn.style.display = '');
+    return canvas;
   });
 }
 
-function shareInvoice() {
-  const captureArea = document.getElementById("invoice-view");
-  const currentThemeBg = window.getComputedStyle(document.body).getPropertyValue('--bg').trim();
-  
-  const buttons = captureArea.querySelectorAll('button');
-  buttons.forEach(btn => btn.style.display = 'none');
-  
-  html2canvas(captureArea, { backgroundColor: currentThemeBg, scale: 3, logging: false, useCORS: true }).then(canvas => {
-    buttons.forEach(btn => btn.style.display = '');
-    
-    canvas.toBlob(async (blob) => {
-      const file = new File([blob], 'ShweInvoice.png', {type: 'image/png'});
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'Shwe Calculator Invoice'
-          });
-        } catch(e) {}
-      } else {
-        const link = document.createElement('a'); 
-        link.download = `ShweInvoice_${Date.now()}.png`; 
-        link.href = canvas.toDataURL('image/png'); 
-        link.click();
+function canvasToBlob(canvas) {
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+async function shareBlob(blob, filename, title) {
+  const file = new File([blob], filename, { type: 'image/png' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title });
+    } catch(e) {
+      if (e.name !== 'AbortError') {
+        downloadBlob(blob, filename);
+        showToast('မျှဝေမရ၍ သိမ်းပြီးပါပြီ');
       }
-    }, 'image/png');
-  });
+    }
+  } else {
+    downloadBlob(blob, filename);
+    showToast('ဓာတ်ပုံ သိမ်းပြီးပါပြီ');
+  }
+}
+
+async function shareAsPhoto() {
+  const canvas = await captureElement('capture-area', false);
+  const blob = await canvasToBlob(canvas);
+  await shareBlob(blob, `ShweCalc_${Date.now()}.png`, 'Shwe Calculator Result');
+}
+
+async function saveAsPhoto() {
+  const canvas = await captureElement('capture-area', false);
+  const blob = await canvasToBlob(canvas);
+  downloadBlob(blob, `ShweCalc_${Date.now()}.png`);
+  showToast('ဓာတ်ပုံ သိမ်းပြီးပါပြီ');
+}
+
+async function shareInvoice() {
+  const canvas = await captureElement('invoice-view', true);
+  const blob = await canvasToBlob(canvas);
+  await shareBlob(blob, `ShweInvoice_${Date.now()}.png`, 'Shwe Calculator Invoice');
+}
+
+async function saveInvoice() {
+  const canvas = await captureElement('invoice-view', true);
+  const blob = await canvasToBlob(canvas);
+  downloadBlob(blob, `ShweInvoice_${Date.now()}.png`);
+  showToast('ဘောင်ချာ သိမ်းပြီးပါပြီ');
 }
 </script>
 </body>
