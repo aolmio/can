@@ -32,8 +32,7 @@
 @media (min-width: 480px) { :root { --nav-h: 64px; } }
 @media (min-width: 768px) { :root { --nav-h: 66px; --content-max: 820px; --fs-base: 16px; } }
 @media (min-width: 900px) { :root { --rail-w: 88px; } }
-@media (min-width: 1200px) { :root { --content-max: 1020px; --rail-w: 96px; } }
-@media (min-width: 1600px) { :root { --content-max: 1140px; } }
+@media (min-width: 1200px) { :root { --content-max: 1140px; } }
 
 body.ios-light {
   --bg: #f2f2f2;
@@ -747,7 +746,7 @@ body.keyboard-open .main-scroll-area { padding-bottom: 32px; }
           <div class="grid-2">
             <div>
               <div class="card-label">ဂရမ် (Grams)</div>
-              <input type="number" id="gramsInput" inputmode="decimal" step="0.01" placeholder="0.00" class="inp">
+              <input type="number" id="gramsInput" inputmode="decimal" step="0.01" placeholder="0.00" class="inp" oninput="convertUnits('grams')">
             </div>
             <div>
               <div class="card-label">စံသတ်မှတ်ချက်</div>
@@ -758,9 +757,9 @@ body.keyboard-open .main-scroll-area { padding-bottom: 32px; }
             </div>
           </div>
           <div class="grid-3" style="margin-top:12px;">
-            <input type="number" id="uKyat" inputmode="decimal" placeholder="ကျပ်" class="inp inp-center" onblur="handleRollover('uKyat','uPe','uYway');convertUnits('units');">
-            <input type="number" id="uPe" inputmode="decimal" placeholder="ပဲ" class="inp inp-center" onblur="handleRollover('uKyat','uPe','uYway');convertUnits('units');">
-            <input type="number" id="uYway" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center" onblur="handleRollover('uKyat','uPe','uYway');convertUnits('units');">
+            <input type="number" id="uKyat" inputmode="decimal" placeholder="ကျပ်" class="inp inp-center" oninput="convertUnits('units')" onblur="handleRollover('uKyat','uPe','uYway');convertUnits('units');">
+            <input type="number" id="uPe" inputmode="decimal" placeholder="ပဲ" class="inp inp-center" oninput="convertUnits('units')" onblur="handleRollover('uKyat','uPe','uYway');convertUnits('units');">
+            <input type="number" id="uYway" inputmode="decimal" step="0.01" placeholder="ရွေး" class="inp inp-center" oninput="convertUnits('units')" onblur="handleRollover('uKyat','uPe','uYway');convertUnits('units');">
           </div>
         </div>
 
@@ -1617,23 +1616,28 @@ function useNetWeightInCalc() {
   showToast('ရွှေအလေးချိန်သို့ ထည့်သွင်းပြီးပါပြီ');
 }
 
-document.getElementById('gramsInput').addEventListener('input', () => convertUnits('grams'));
-['uKyat', 'uPe', 'uYway'].forEach(id => document.getElementById(id).addEventListener('input', () => convertUnits('units')));
-
 function convertUnits(source) {
   const factor = parseFloat(document.getElementById('standard').value);
   let kyatDec = 0;
-  if (source === 'grams') { kyatDec = (parseFloat(document.getElementById('gramsInput').value) || 0) / factor; }
-  else { kyatDec = toDecimal(document.getElementById('uKyat').value, document.getElementById('uPe').value, document.getElementById('uYway').value); }
-  if (source === 'units' || source === 'grams') {
-    let parts = fromDecimal(kyatDec).match(/\d+(\.\d+)?/g);
-    document.getElementById('uKyat').value = parts ? (parseFloat(parts[0]) || "") : "";
-    document.getElementById('uPe').value = parts ? (parseFloat(parts[1]) || "") : "";
-    document.getElementById('uYway').value = parts ? (parseFloat(parts[2]) || "") : "";
+  
+  if (source === 'grams') {
+    kyatDec = (parseFloat(document.getElementById('gramsInput').value) || 0) / factor;
+    let k = Math.floor(kyatDec + 0.0000001);
+    let remPe = (kyatDec - k) * 16;
+    let p = Math.floor(remPe + 0.0000001);
+    let y = parseFloat(((remPe - p) * 8).toFixed(2));
+    if (y >= 8) { p++; y = 0; }
+    if (p >= 16) { k++; p = 0; }
+    document.getElementById('uKyat').value = k > 0 ? k : "";
+    document.getElementById('uPe').value = p > 0 ? p : "";
+    document.getElementById('uYway').value = y > 0 ? y : "";
+  } else {
+    kyatDec = toDecimal(document.getElementById('uKyat').value, document.getElementById('uPe').value, document.getElementById('uYway').value);
+    document.getElementById('gramsInput').value = kyatDec > 0 ? (kyatDec * factor).toFixed(3) : "";
   }
+  
   document.getElementById('uDisplay').innerText = fromDecimal(kyatDec);
   document.getElementById('uSubDisplay').innerText = `(${kyatDec.toFixed(4)} ကျပ်) | ${(kyatDec * factor).toFixed(3)} g`;
-  if (source !== 'grams') { document.getElementById('gramsInput').value = (kyatDec * factor).toFixed(3); }
 }
 
 function convertDiamondUnits(mode) {
