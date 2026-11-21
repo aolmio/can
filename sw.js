@@ -1,49 +1,85 @@
-const VERSION = 'shwe-calc-v3';
-const SHELL = ['./', './index.html', './styles.css', './app.js', './manifest.json', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png'];
-const CDN = [
-  'https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js',
+const VERSION = 'gss-v2';
+const SHELL_CACHE = VERSION + '-shell';
+const LIB_CACHE = VERSION + '-lib';
+const SHELL = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
+const LIBS = [
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.wasm',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
 ];
-const HOSTS = ['cdn.jsdelivr.net', 'cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
+const LIB_HOSTS = ['cdn.jsdelivr.net', 'cdnjs.cloudflare.com', 'unpkg.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
-self.addEventListener('install', e => {
-  e.waitUntil((async () => {
-    const cache = await caches.open(VERSION);
-    await cache.addAll(SHELL);
-    await Promise.allSettled(CDN.map(async u => cache.put(u, await fetch(u, { mode: 'no-cors' }))));
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const shell = await caches.open(SHELL_CACHE);
+    await Promise.all(SHELL.map(u => shell.add(new Request(u, { cache: 'reload' })).catch(() => {})));
+    const lib = await caches.open(LIB_CACHE);
+    await Promise.all(LIBS.map(async u => {
+      try {
+        const r = await fetch(u, { mode: 'cors' });
+        if (r.ok) await lib.put(u, r);
+      } catch (e) {}
+    }));
     await self.skipWaiting();
   })());
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil((async () => {
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)));
+    await Promise.all(keys.filter(k => !k.startsWith(VERSION)).map(k => caches.delete(k)));
     await self.clients.claim();
   })());
 });
 
-const staleWhileRevalidate = async req => {
-  const cache = await caches.open(VERSION);
-  const hit = await cache.match(req);
-  const net = fetch(req).then(res => {
-    if (res.ok || res.type === 'opaque') cache.put(req, res.clone());
+async function networkFirst(request, cacheName, fallbackKey, timeout) {
+  const cache = await caches.open(cacheName);
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeout);
+    const res = await fetch(request, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (res && res.ok) cache.put(fallbackKey || request, res.clone());
     return res;
-  }).catch(() => hit);
-  return hit || net;
-};
+  } catch (e) {
+    const hit = (await cache.match(fallbackKey || request, { ignoreSearch: true })) || (await cache.match('./index.html'));
+    if (hit) return hit;
+    return new Response('Offline', { status: 503, statusText: 'Offline', headers: { 'Content-Type': 'text/plain' } });
+  }
+}
 
-self.addEventListener('fetch', e => {
-  const req = e.request;
+async function staleWhileRevalidate(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const hit = await cache.match(request);
+  const refresh = fetch(request).then(res => {
+    if (res && (res.ok || res.type === 'opaque')) cache.put(request, res.clone());
+    return res;
+  }).catch(() => null);
+  if (hit) { refresh.catch(() => {}); return hit; }
+  const res = await refresh;
+  return res || new Response('', { status: 504, statusText: 'Offline' });
+}
+
+self.addEventListener('fetch', event => {
+  const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  if (req.headers.has('range')) return;
   if (req.mode === 'navigate') {
-    e.respondWith(
-      fetch(req)
-        .then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put('./index.html', copy)); return res; })
-        .catch(() => caches.match('./index.html'))
-    );
+    event.respondWith(networkFirst(req, SHELL_CACHE, './index.html', 3500));
     return;
   }
-  if (url.origin === location.origin || HOSTS.includes(url.hostname)) e.respondWith(staleWhileRevalidate(req));
+  if (url.origin === self.location.origin) {
+    event.respondWith(staleWhileRevalidate(req, SHELL_CACHE));
+    return;
+  }
+  if (LIB_HOSTS.includes(url.hostname)) {
+    event.respondWith(staleWhileRevalidate(req, LIB_CACHE));
+  }
+});
+
+self.addEventListener('message', event => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
